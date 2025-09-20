@@ -7,4 +7,5 @@
 
 public extension Math {
     static let C: Math = .init(floatLiteral: 299792458) // m/s
+    static let SpeedOfLight = C
 }

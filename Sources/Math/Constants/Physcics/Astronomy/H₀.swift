@@ -6,7 +6,7 @@
 //
 
 public extension Math {
-    static let H: Math = .init(floatLiteral: 72.6)
+    static let H: Math = .init(floatLiteral: 72.6) // km/s/Mpc
     static let H₀ = H
     static let hubbelsConstant = H
 }
