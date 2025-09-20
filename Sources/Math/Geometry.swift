@@ -7,103 +7,128 @@
 
 import Foundation
 
-struct Triangle {
-    var a: Double? // side opposite alpha
-    var b: Double?
-    var c: Double?
-    var alpha: Double? // angle in degrees
-    var beta: Double?
-    var gamma: Double?
+// MARK: - Precedence Group for Math Functions
+// Ensures functions like sin, cos, etc., are evaluated with correct precedence
+precedencegroup FunctionPrecedence {
+    higherThan: DekationPrecedence
+    associativity: right
+}
 
-    // MARK: - Helper functions
-    private func deg2rad(_ deg: Double) -> Double {
-        return deg * .pi / 180
+public extension Math {
+
+    // MARK: - Sine Function
+    /// Computes the sine of a Math value using a Taylor series expansion.
+    /// - Parameter x: Angle in degrees or radians based on MathSettings.
+    /// - Returns: sin(x) as a Math value.
+    ///
+    /// Note: Precision depends on `MathSettings.shared.percision`.
+    static func sin(_ x: Math) -> Math {
+        // 1. Get current settings (angle mode and precision)
+        let settings = MathSettings.shared
+
+        // 2. Convert input to radians if necessary (Taylor series expects radians)
+        let rad: Math
+        switch settings.angleMode {
+        case .degrees:
+            rad = x * .pi / 180
+        case .radians:
+            rad = x
+        }
+
+        let n = settings.percision
+
+        // 3. Compute sine using Taylor expansion
+        var result: Math = 0
+        for k in 0..<n {
+            let numerator = ((-1) ** k) * (rad ** (2 * k + 1))
+            let denominator = (2 * k + 1)~!
+            result += numerator / denominator
+        }
+        return result
     }
-    
-    private func rad2deg(_ rad: Double) -> Double {
-        return rad * 180 / .pi
+
+    // MARK: - Cosine Function
+    /// Computes the cosine of a Math value using a Taylor series expansion.
+    /// - Parameter x: Angle in degrees or radians based on MathSettings.
+    /// - Returns: cos(x) as a Math value.
+    static func cos(_ x: Math) -> Math {
+        // Convert input to radians
+        let rad: Math
+        switch MathSettings.shared.angleMode {
+        case .degrees:
+            rad = x * .pi / 180
+        case .radians:
+            rad = x
+        }
+
+        let n = MathSettings.shared.percision
+
+        // Compute cosine using Taylor expansion
+        var result: Math = 0
+        for k in 0..<n {
+            let numerator = ((-1) ** k) * (rad ** (2 * k))
+            let denominator = (2 * k)~!
+            result += numerator / denominator
+        }
+        return result
     }
-    
-    // MARK: - Solve Triangle
-    mutating func solve() throws {
-        // Count how many sides and angles we know
-        let knownSides = [a, b, c].compactMap { $0 }.count
-        let knownAngles = [alpha, beta, gamma].compactMap { $0 }.count
-        
-        guard knownSides + knownAngles >= 3 else {
-            throw NSError(domain: "TriangleSolver", code: 1, userInfo: [NSLocalizedDescriptionKey: "At least 3 pieces of info required."])
+
+    // MARK: - Arcsine Function
+    /// Computes arcsin(y) using Newton-Raphson iteration.
+    /// - Parameter y: Value in [-1, 1] range.
+    /// - Returns: asin(y) as a Math value (degrees or radians depending on MathSettings).
+    ///
+    /// ⚠️ Warning: Precision issues may occur when y = 1 / sqrt(2) (≈0.7071067812),
+    /// resulting in small errors (~1e-16). Use caution and verify results for critical calculations.
+    static func asin(_ y: Math) -> Math {
+        // 1. Clamp input domain [-1, 1]
+        guard y >= -1 && y <= 1 else {
+            fatalError("asin domain error: value must be between -1 and 1")
         }
-        
-        // 1️⃣ If 2 angles are known, compute the third
-        if let alpha = alpha, let beta = beta, gamma == nil {
-            gamma = 180 - alpha - beta
-        } else if let alpha = alpha, let gamma = gamma, beta == nil {
-            beta = 180 - alpha - gamma
-        } else if let beta = beta, let gamma = gamma, alpha == nil {
-            alpha = 180 - beta - gamma
+
+        // 2. Initial guess using small-angle approximation: asin(y) ≈ y
+        var x = y
+
+        // 3. Newton-Raphson iterations
+        let iterations = MathSettings.shared.percision
+        for _ in 0..<iterations {
+            let f = Calculate(settings: .init(angleMode: .radians, precision: iterations)) {
+                sin(x)
+            } - y
+            let fPrime = Calculate(settings: .init(angleMode: .radians, precision: iterations)) {
+                cos(x)
+            }
+            x -= f / fPrime
         }
-        
-        // 2️⃣ Solve using Law of Sines if we know one side and its opposite angle
-        if let a = a, let alpha = alpha {
-            if let beta = beta, b == nil {
-                b = a * sin(deg2rad(beta)) / sin(deg2rad(alpha))
-            }
-            if let gamma = gamma, c == nil {
-                c = a * sin(deg2rad(gamma)) / sin(deg2rad(alpha))
-            }
+
+        // 4. Convert result back to the current angle unit
+        switch MathSettings.shared.angleMode {
+        case .degrees:
+            return x * 180 / .pi
+        case .radians:
+            return x
         }
-        if let b = b, let beta = beta {
-            if let alpha = alpha, a == nil {
-                a = b * sin(deg2rad(alpha)) / sin(deg2rad(beta))
-            }
-            if let gamma = gamma, c == nil {
-                c = b * sin(deg2rad(gamma)) / sin(deg2rad(beta))
-            }
-        }
-        if let c = c, let gamma = gamma {
-            if let alpha = alpha, a == nil {
-                a = c * sin(deg2rad(alpha)) / sin(deg2rad(gamma))
-            }
-            if let beta = beta, b == nil {
-                b = c * sin(deg2rad(beta)) / sin(deg2rad(gamma))
-            }
-        }
-        
-        // 3️⃣ Solve using Law of Cosines for remaining sides
-        if let a = a, let b = b, let gamma = gamma, c == nil {
-            c = sqrt(a*a + b*b - 2*a*b*cos(deg2rad(gamma)))
-        }
-        if let a = a, let c = c, let beta = beta, b == nil {
-            b = sqrt(a*a + c*c - 2*a*c*cos(deg2rad(beta)))
-        }
-        if let b = b, let c = c, let alpha = alpha, a == nil {
-            a = sqrt(b*b + c*c - 2*b*c*cos(deg2rad(alpha)))
-        }
-        
-        // 4️⃣ Solve angles with Law of Cosines if needed
-        if let a = a, let b = b, let c = c {
-            if alpha == nil {
-                alpha = rad2deg(acos((b*b + c*c - a*a)/(2*b*c)))
-            }
-            if beta == nil {
-                beta = rad2deg(acos((a*a + c*c - b*b)/(2*a*c)))
-            }
-            if gamma == nil {
-                gamma = 180 - (alpha ?? 0) - (beta ?? 0)
-            }
-        }
-    }
-    
-    // Optional: compute perimeter
-    func perimeter() -> Double? {
-        guard let a = a, let b = b, let c = c else { return nil }
-        return a + b + c
-    }
-    
-    // Optional: compute area using Heron's formula
-    func area() -> Double? {
-        guard let a = a, let b = b, let c = c else { return nil }
-        let s = (a + b + c) / 2
-        return sqrt(s * (s - a) * (s - b) * (s - c))
     }
 }
+
+// MARK: - Triangle Solver (Commented Out)
+// The following triangle solver is currently inactive. It can solve triangles
+// using combinations of the Law of Sines and Law of Cosines, and compute
+// perimeter or area. Requires at least 3 known pieces of information
+// (sides/angles) to solve.
+//
+// ⚠️ Warning: Trigonometric calculations like sin(45°) ≈ 1/sqrt(2) are
+// untested for full precision due to small floating-point errors (~1e-16).
+
+/*
+struct Triangle {
+    var a: Math? // side opposite alpha
+    var b: Math?
+    var c: Math?
+    var alpha: Math? // angle in degrees
+    var beta: Math?
+    var gamma: Math?
+    
+    ...
+}
+*/
