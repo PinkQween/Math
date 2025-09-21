@@ -1,5 +1,5 @@
 //
-//  Pi.swift
+//  π.swift
 //  Math
 //
 //  Created by Hanna Skairipa on 9/19/25.

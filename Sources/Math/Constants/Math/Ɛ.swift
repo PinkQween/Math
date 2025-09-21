@@ -1,5 +1,5 @@
 //
-//  e.swift
+//  Ɛ.swift
 //  Math
 //
 //  Created by Hanna Skairipa on 9/19/25.
