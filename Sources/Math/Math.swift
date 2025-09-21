@@ -352,30 +352,24 @@ extension Math: CustomStringConvertible {
 #if canImport(SwiftUI)
 import SwiftUI
 
-// MARK: - SwiftUI Integration
-
-/// Conformance for SwiftUI's `Text` interpolation.
-///
-/// This is only available on platforms that support `LocalizedStringResource`
-/// (iOS 16.0+, macOS 13.0+, tvOS 16.0+, watchOS 9.0+).
 extension Math {
+    /// Returns a Text view using proper LocalizedStringResource (no deprecated interpolation).
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
-    public var localizedStringResource: LocalizedStringResource {
-        .init(stringLiteral: description)
+    public var text: Text {
+        Text(self.localizedStringResource)
+    }
+
+    /// Returns a safe fallback Text for older OS versions.
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+    public var textFallback: Text {
+        Text(verbatim: description)
     }
 }
 
-/// Cross-platform safe fallback for when `LocalizedStringResource`
-/// isn’t available (older OS or toolchains).
-extension Math {
-    /// Returns a `Text` view representation of the value.
-    ///
-    /// This always returns a `Text` initialized with the verbatim string
-    /// representation of the `Math` value, providing consistent behavior
-    /// across all platform versions.
-    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-    public var asText: Text {
-        return Text(verbatim: description)
+@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+extension Math: CustomLocalizedStringResourceConvertible {
+    public var localizedStringResource: LocalizedStringResource {
+        .init(stringLiteral: description)
     }
 }
 #endif
