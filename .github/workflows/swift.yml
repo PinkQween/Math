@@ -16,9 +16,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # Install Swift 6.2
-    - name: Set up Swift 6.2
-      uses: fwal/setup-swift@v2
+    - name: Set up Swift 6.2.0
+      uses: SwiftyLab/setup-swift@latest
       with:
         swift-version: '6.2.0'
 
