@@ -123,7 +123,7 @@ public func Calculate<T>(
 
 // MARK: - Internal Storage
 /// Represents numeric values internally.
-public enum MathStorage: Sendable {
+public enum MathStorage: Sendable, Hashable {
     case int(Int)
     case double(Double)
     case bigInt(BigInt)
@@ -133,7 +133,7 @@ public enum MathStorage: Sendable {
 // MARK: - Number Protocol
 /// Protocol conformance for numeric behaviors Math supports.
 public protocol NumberProtocol: Equatable, Comparable, ExpressibleByIntegerLiteral,
-                                ExpressibleByFloatLiteral, ExpressibleByStringLiteral, Sendable, Strideable {}
+                                ExpressibleByFloatLiteral, ExpressibleByStringLiteral, Sendable, Strideable, Hashable {}
 
 // MARK: - Core Math Type
 /// Main type supporting arbitrary-precision math, hyperoperations, roots, and factorials.
@@ -262,6 +262,49 @@ public struct Math: NumberProtocol {
         } else {
             return lv < rv
         }
+    }
+    
+    /// Determines whether the current value is a prime number.
+    ///
+    /// A *prime number* is a positive integer greater than `1` whose only divisors
+    /// are `1` and itself. Equivalently, `n` is prime if there does **not** exist
+    /// any integer `d` with `2 ≤ d ≤ √n` such that `n % d == 0`.
+    ///
+    /// - Returns: `true` if the number is prime; otherwise, `false`.
+    ///
+    /// - Complexity:
+    ///   Runs in **O(√n)** time, since divisibility is only checked up to the
+    ///   square root of the value.
+    ///
+    /// - Important:
+    ///   Values less than `2` are **not prime** by definition.
+    ///
+    /// # Examples
+    ///
+    /// ```swift
+    /// Math(int: 2).isPrime()   // true
+    /// Math(int: 17).isPrime()  // true
+    /// Math(int: 18).isPrime()  // false
+    /// Math(int: -7).isPrime()  // false
+    /// Math(int: 0).isPrime()   // false
+    /// ```
+    public func isPrime() -> Bool {
+        guard let n = self.asInt else { return false }
+        if n < 2 { return false }
+        if n == 2 { return true }
+        if n % 2 == 0 { return false }
+
+        let limit = Int(Double(n).squareRoot())
+        if limit < 3 { return true } // no need to check further
+
+        for i in stride(from: 3, through: limit, by: 2) {
+            if n % i == 0 { return false }
+        }
+        return true
+    }
+    
+    public func getParity() -> Parity {
+        return self % 2 == 0 ? .even : .odd
     }
 }
 
@@ -511,6 +554,20 @@ public extension Math {
         return Gfactorial(x, step: 4)
     }
 }
+
+//// -------------------------------
+//// Primorial Factorial n#
+//// -------------------------------
+//
+//postfix operator
+//
+//public extension Math {
+//
+//}
+
+// -------------------------------
+// Super Factorial n$
+// -------------------------------
 
 // MARK: - Roots
 infix operator |/: ExponentiationPrecedence
