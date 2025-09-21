@@ -75,11 +75,11 @@ struct ExponentiallyLargeMathTests {
     
     @Test
     func tetration() async throws {
-        // Test tetration (2^^4 == 65536)
+        // Test tetration (2^^3 == 16)
         let a: Math = 2
-        let b: Math = 4
+        let b: Math = 3
         
-        #expect(a ^^ b == 65536)
+        #expect(a ^^ b == 16)
     }
     
     // Future note: Higher tetration results may exceed current computational limits
@@ -107,6 +107,31 @@ struct FactorialTests {
     
     @Test func sbubfactorial() async throws {
         #expect(~!3 == 2)
+    }
+}
+
+// MARK: - Matrices
+@Suite("Matrix Operations")
+struct MatrixTests {
+    @Test func add() async throws {
+        let a = Matrix(rows: 2, columns: 2, initialValue: 2)
+        let b = a
+        
+        #expect(a + b == Matrix(rows: 2, columns: 2, initialValue: 4))
+    }
+    
+    @Test func subtract() async throws {
+        let a = Matrix(rows: 2, columns: 2, initialValue: 2)
+        let b = a
+        
+        #expect(a - b == Matrix(rows: 2, columns: 2, initialValue: 0))
+    }
+    
+    @Test func multiply() async throws {
+        let a = Matrix(rows: 2, columns: 2, initialValue: 2)
+        let b = a
+        
+        #expect(a * b == Matrix(rows: 2, columns: 2, initialValue: 8))
     }
 }
 

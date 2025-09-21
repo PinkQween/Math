@@ -133,7 +133,7 @@ public enum MathStorage: Sendable {
 // MARK: - Number Protocol
 /// Protocol conformance for numeric behaviors Math supports.
 public protocol NumberProtocol: Equatable, Comparable, ExpressibleByIntegerLiteral,
-    ExpressibleByFloatLiteral, ExpressibleByStringLiteral, Sendable, Strideable {}
+                                ExpressibleByFloatLiteral, ExpressibleByStringLiteral, Sendable, Strideable {}
 
 // MARK: - Core Math Type
 /// Main type supporting arbitrary-precision math, hyperoperations, roots, and factorials.
@@ -206,7 +206,7 @@ public struct Math: NumberProtocol {
     }
     
     // MARK: - BigDecimal Helpers
-    private func asBigDecimal() -> (BigInt, Int) {
+    public func asBigDecimal() -> (BigInt, Int) {
         switch storage {
         case .int(let v): return (BigInt(v), 0)
         case .double(let v):
@@ -230,15 +230,38 @@ public struct Math: NumberProtocol {
         return (lv * BigInt(10).power(rs - ls), rv, rs)
     }
     
-    // MARK: - Comparison Operators
     public static func == (lhs: Math, rhs: Math) -> Bool {
-        let (lv, rv, _) = lhs.align(rhs)
-        return lv == rv
+        // Convert both to BigDecimal form (BigInt + scale)
+        let (lv, ls) = lhs.asBigDecimal()
+        let (rv, rs) = rhs.asBigDecimal()
+        
+        // Adjust scales to match
+        if ls > rs {
+            let scaleDiff = ls - rs
+            return lv == rv * BigInt(10).power(scaleDiff)
+        } else if rs > ls {
+            let scaleDiff = rs - ls
+            return lv * BigInt(10).power(scaleDiff) == rv
+        } else {
+            return lv == rv
+        }
     }
     
     public static func < (lhs: Math, rhs: Math) -> Bool {
-        let (lv, rv, _) = lhs.align(rhs)
-        return lv < rv
+        // Convert both to BigDecimal form (BigInt + scale)
+        let (lv, ls) = lhs.asBigDecimal()
+        let (rv, rs) = rhs.asBigDecimal()
+        
+        // Adjust scales to match
+        if ls > rs {
+            let scaleDiff = ls - rs
+            return lv < rv * BigInt(10).power(scaleDiff)
+        } else if rs > ls {
+            let scaleDiff = rs - ls
+            return lv * BigInt(10).power(scaleDiff) < rv
+        } else {
+            return lv < rv
+        }
     }
 }
 
@@ -333,11 +356,53 @@ infix operator ^^^^^^^: NonationPrecedence
 infix operator ^^^^^^^^: DekationPrecedence
 
 public extension Math {
-    /// Generalized hyperoperation (level 2 = exponentiation, 3 = tetration, etc.)
-    private static func hyper(_ a: Math, _ b: Math, level: Int) -> Math {
-        guard let n = b.asInt, n > 0 else { return 1 }
-        if n == 1 { return a }
-        return hyper(a, hyper(a, Math(integerLiteral: n - 1), level: level - 1), level: level - 1)
+    /// Generalized hyperoperation:
+    /// Level 0 = addition, 1 = multiplication, 2 = exponentiation,
+    /// 3 = tetration, 4 = pentation, etc.
+    ///
+    /// - Parameters:
+    ///   - a: Base
+    ///   - b: Height/iteration count
+    ///   - level: Hyperoperation level
+    /// - Returns: Result of hyperoperation `H_level(a, b)`
+    static func hyper(_ a: Math, _ b: Math, level: Int) -> Math {
+        // Validate input
+        guard level >= 0 else { fatalError("Hyperoperation level must be non-negative") }
+        guard let n = b.asInt, n >= 0 else { fatalError("Hyperoperation 'b' must be non-negative integer") }
+        
+        // Base cases for hyperoperations
+        switch level {
+        case 0: // Addition: a + b
+            return a + b
+        case 1: // Multiplication: a * b
+            return a * b
+        case 2: // Exponentiation: a ** b
+            return a ** b
+        case 3 where n == 0: // Tetration: a^^0 = 1
+            return 1
+        default:
+            if n == 0 { return 1 } // General fallback: H_level(a,0) = 1
+        }
+        
+        // Use iterative approach for levels >= 3 to avoid stack overflow
+        var result: Math = 1
+        switch level {
+        case 3: // Tetration: a^^b = a^(a^(... b times))
+            result = 1
+            for _ in 0..<n {
+                result = a ** result
+            }
+        default:
+            // For level > 3: hyperoperation recursive definition
+            result = 1
+            var temp = Math(1)
+            for _ in 0..<n {
+                temp = hyper(a, temp, level: level - 1)
+            }
+            result = temp
+        }
+        
+        return result
     }
     
     static func ** (lhs: Math, rhs: Math) -> Math {
@@ -395,13 +460,13 @@ public extension Math {
         guard let n = x.asInt, n >= 0 else { return 1 }
         if n == 0 { return 1 }
         if n == 1 { return 0 }
-
+        
         var dp: [BigInt] = [1, 0] // !0=1, !1=0
         for i in 2...n {
             let value = BigInt(i - 1) * (dp[i - 1] + dp[i - 2])
             dp.append(value)
         }
-
+        
         return Math(bigDecimal: dp[n], scale: 0)
     }
 }
@@ -430,17 +495,17 @@ public extension Math {
         }
         return result
     }
-
+    
     /// Double factorial: `n!! = n × (n-2) × (n-4) ...`
     static postfix func ~!! (x: Math) -> Math {
         return Gfactorial(x, step: 2)
     }
-
+    
     /// Triple factorial: `n!!! = n × (n-3) × (n-6) ...`
     static postfix func ~!!! (x: Math) -> Math {
         return Gfactorial(x, step: 3)
     }
-
+    
     /// Quadruple factorial: `n!!!! = n × (n-4) × (n-8) ...`
     static postfix func ~!!!! (x: Math) -> Math {
         return Gfactorial(x, step: 4)
