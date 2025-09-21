@@ -353,21 +353,18 @@ extension Math: CustomStringConvertible {
 import SwiftUI
 
 extension Math {
-    /// Returns a Text view using proper LocalizedStringResource (no deprecated interpolation).
-    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
-    public var text: Text {
-        Text(self.localizedStringResource)
-    }
-
-    /// Returns a safe fallback Text for older OS versions.
+    /// SwiftUI-safe Text for all OS versions
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-    public var textFallback: Text {
-        Text(verbatim: description)
+    public var text: Text {
+        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
+            return Text(localizedStringResource)
+        } else {
+            return Text(verbatim: description)
+        }
     }
-}
-
-@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
-extension Math: CustomLocalizedStringResourceConvertible {
+    
+    /// LocalizedStringResource only available on newer OSes
+    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
     public var localizedStringResource: LocalizedStringResource {
         .init(stringLiteral: description)
     }
