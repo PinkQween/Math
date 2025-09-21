@@ -309,13 +309,21 @@ public struct Math: NumberProtocol {
 }
 
 // MARK: - String Convertible
+
 extension Math: CustomStringConvertible {
+    /// A textual description of the `Math` value.
+    ///
+    /// Handles conversion for:
+    /// - `Int`
+    /// - `Double`
+    /// - `BigInt`
+    /// - `BigDecimal` (with proper decimal placement and trimming of trailing zeros).
     public var description: String {
         switch storage {
         case .int(let v):
             return "\(v)"
         case .double(let v):
-            return String(v) // uses default Swift formatting
+            return String(v) // Uses Swift’s default formatting
         case .bigInt(let v):
             return v.description
         case .bigDecimal(let v, let scale):
@@ -328,6 +336,7 @@ extension Math: CustomStringConvertible {
                 s = String(repeating: "0", count: scale - s.count + 1) + s
             }
             
+            // Insert decimal point
             let index = s.index(s.endIndex, offsetBy: -scale)
             s.insert(".", at: index)
             
@@ -337,6 +346,22 @@ extension Math: CustomStringConvertible {
             
             return s
         }
+    }
+}
+
+extension Math: CustomLocalizedStringResourceConvertible {
+    /// A localized string resource representation of the `Math` value.
+    ///
+    /// This enables `Math` values to be directly interpolated inside SwiftUI
+    /// `Text` views without warnings or deprecation messages.
+    ///
+    /// Example:
+    /// ```swift
+    /// Text("Value: \(Constants.Math.pi)")
+    /// ```
+    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    public var localizedStringResource: LocalizedStringResource {
+        .init(stringLiteral: description)
     }
 }
 
