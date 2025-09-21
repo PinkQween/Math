@@ -349,21 +349,36 @@ extension Math: CustomStringConvertible {
     }
 }
 
-extension Math: CustomLocalizedStringResourceConvertible {
-    /// A localized string resource representation of the `Math` value.
-    ///
-    /// This enables `Math` values to be directly interpolated inside SwiftUI
-    /// `Text` views without warnings or deprecation messages.
-    ///
-    /// Example:
-    /// ```swift
-    /// Text("Value: \(Constants.Math.pi)")
-    /// ```
+#if canImport(SwiftUI)
+import SwiftUI
+
+// MARK: - SwiftUI Integration
+
+/// Conformance for SwiftUI's `Text` interpolation.
+///
+/// This is only available on platforms that support `LocalizedStringResource`
+/// (iOS 16.0+, macOS 13.0+, tvOS 16.0+, watchOS 9.0+).
+extension Math {
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
     public var localizedStringResource: LocalizedStringResource {
         .init(stringLiteral: description)
     }
 }
+
+/// Cross-platform safe fallback for when `LocalizedStringResource`
+/// isn’t available (older OS or toolchains).
+extension Math {
+    /// Returns a `Text` view representation of the value.
+    ///
+    /// This always returns a `Text` initialized with the verbatim string
+    /// representation of the `Math` value, providing consistent behavior
+    /// across all platform versions.
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+    public var asText: Text {
+        return Text(verbatim: description)
+    }
+}
+#endif
 
 // MARK: - Arithmetic Operators
 public extension Math {
@@ -658,3 +673,4 @@ public extension Math {
 public extension Int    { init(_ value: Math) { self = value.asInt ?? 0 } }
 public extension Double { init(_ value: Math) { self = value.asDouble ?? 0 } }
 public extension Float  { init(_ value: Math) { self = value.asDouble.map(Float.init) ?? 0 } }
+
