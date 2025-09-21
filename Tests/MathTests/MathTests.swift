@@ -97,6 +97,20 @@ struct RootTests {
     }
 }
 
+
+// MARK: - Factorial Calulations
+@Suite("Factorials")
+struct FactorialTests {
+    @Test func factorial() async throws {
+        #expect(3~! == 6)
+    }
+    
+    @Test func sbubfactorial() async throws {
+        #expect(~!3 == 2)
+    }
+}
+
+
 // MARK: - Geometry Tests (Commented Out)
 /*
 @Suite("Geometry")
