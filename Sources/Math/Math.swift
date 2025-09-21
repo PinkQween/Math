@@ -352,18 +352,24 @@ extension Math: CustomStringConvertible {
 #if canImport(SwiftUI)
 import SwiftUI
 
-extension Math {
-    /// SwiftUI-safe Text for all OS versions
-    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-    public var text: Text {
+// MARK: - Text Interpolation for Math
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension LocalizedStringKey.StringInterpolation {
+    
+    /// Interpolates `Math` safely in SwiftUI `Text`.
+    /// Works on all OS versions.
+    public mutating func appendInterpolation(_ value: Math) {
         if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            return Text(localizedStringResource)
+            // Use LocalizedStringResource for new OSes
+            appendInterpolation(value.localizedStringResource)
         } else {
-            return Text(verbatim: description)
+            // Fallback for older OSes
+            appendLiteral(value.description)
         }
     }
-    
-    /// LocalizedStringResource only available on newer OSes
+}
+
+extension Math {
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
     public var localizedStringResource: LocalizedStringResource {
         .init(stringLiteral: description)
