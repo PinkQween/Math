@@ -293,10 +293,10 @@ public struct Math: NumberProtocol {
         if n < 2 { return false }
         if n == 2 { return true }
         if n % 2 == 0 { return false }
-
+        
         let limit = Int(Double(n).squareRoot())
         if limit < 3 { return true } // no need to check further
-
+        
         for i in stride(from: 3, through: limit, by: 2) {
             if n % i == 0 { return false }
         }
@@ -305,6 +305,38 @@ public struct Math: NumberProtocol {
     
     public func getParity() -> Parity {
         return self % 2 == 0 ? .even : .odd
+    }
+}
+
+// MARK: - String Convertible
+extension Math: CustomStringConvertible {
+    public var description: String {
+        switch storage {
+        case .int(let v):
+            return "\(v)"
+        case .double(let v):
+            return String(v) // uses default Swift formatting
+        case .bigInt(let v):
+            return v.description
+        case .bigDecimal(let v, let scale):
+            // Convert BigInt + scale → string with decimal point
+            var s = v.description
+            if scale == 0 { return s }
+            
+            // Pad with leading zeros if scale > length
+            if s.count <= scale {
+                s = String(repeating: "0", count: scale - s.count + 1) + s
+            }
+            
+            let index = s.index(s.endIndex, offsetBy: -scale)
+            s.insert(".", at: index)
+            
+            // Strip trailing zeros
+            while s.last == "0" { s.removeLast() }
+            if s.last == "." { s.removeLast() }
+            
+            return s
+        }
     }
 }
 
