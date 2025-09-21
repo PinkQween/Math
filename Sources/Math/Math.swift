@@ -20,10 +20,22 @@ public enum AngleMode: Sendable {
 }
 
 // MARK: - Math State
-/// Encapsulates calculation settings for Math operations.
-/// Can be expanded with rounding modes or additional precision options.
+/// Represents the configuration for performing math operations.
+///
+/// A `MathState` defines how calculations are carried out globally
+/// or within a scoped calculation. You can adjust properties such as
+/// angle measurement (degrees vs. radians) and precision settings.
+/// In the future, this type may be expanded to include rounding modes
+/// or other options that influence numerical results.
 public struct MathState: Sendable {
+    
+    /// The mode in which angles are interpreted (e.g. degrees or radians).
     public var angleMode: AngleMode
+    
+    /// The numeric precision used for calculations.
+    ///
+    /// For example, this can determine the number of digits preserved
+    /// in results or the size of intermediate values in arbitrary-precision math.
     public var precision: Math
 }
 
@@ -36,7 +48,7 @@ public final class MathSettings: @unchecked Sendable {
     private let lock = NSLock()
     
     private var _angleMode: AngleMode = .degrees
-    private var _percision: Math = 28174
+    private var _precision: Math = 28174
     
     // Thread-safe accessors
     public var angleMode: AngleMode {
@@ -44,30 +56,61 @@ public final class MathSettings: @unchecked Sendable {
         set { lock.withLock { _angleMode = newValue } }
     }
     
-    public var percision: Math {
-        get { lock.withLock { _percision } }
-        set { lock.withLock { _percision = newValue } }
+    public var precision: Math {
+        get { lock.withLock { _precision } }
+        set { lock.withLock { _precision = newValue } }
     }
     
     /// Get or set the full state atomically.
     public var state: MathState {
-        get { lock.withLock { MathState(angleMode: _angleMode, precision: _percision ) } }
-        set { lock.withLock { _angleMode = newValue.angleMode; _percision = newValue.precision } }
+        get { lock.withLock { MathState(angleMode: _angleMode, precision: _precision) } }
+        set { lock.withLock {
+            _angleMode = newValue.angleMode
+            _precision = newValue.precision
+        }}
     }
 }
 
 // MARK: - Lock Convenience
 extension NSLock {
     /// Executes a closure while holding the lock for thread safety.
+    ///
+    /// This method locks the receiver before invoking the closure and
+    /// guarantees that the lock is released afterward, even if the closure
+    /// throws an error. It provides a safe and concise way to perform
+    /// synchronized work without having to manually call `lock()` and `unlock()`.
+    ///
+    /// - Parameter body: A closure containing the critical section of code
+    ///   that must be executed while the lock is held.
+    /// - Returns: The value returned by the closure.
+    /// - Throws: Rethrows any error that the closure throws.
     func withLock<T>(_ body: () throws -> T) rethrows -> T {
-        lock()
-        defer { unlock() }
+        lock(); defer { unlock() }
         return try body()
     }
 }
 
+
 // MARK: - Scoped Calculation
-/// Temporarily sets a MathState for the duration of the closure, then restores old state.
+/// Executes a block of work under a temporary ``MathState``.
+///
+/// This function replaces the current global math settings with a new state
+/// for the duration of the provided closure, ensuring the previous state
+/// is restored afterward (even if the closure throws).
+///
+/// Use this when you want to perform calculations with specific precision,
+/// angle mode, or other math settings without permanently changing
+/// the global environment.
+///
+/// - Parameters:
+///   - newState: The temporary math state to use while executing `work`.
+///   - work: A closure containing the calculations to perform under the
+///           temporary state.
+/// - Returns: The result of the closure.
+/// - Throws: Rethrows any error thrown by `work`.
+///
+/// - Note: The global ``MathSettings`` is always restored after `work` completes,
+///         regardless of whether it returns normally or throws.
 public func Calculate<T>(
     settings newState: MathState,
     perform work: () throws -> T
@@ -105,18 +148,16 @@ public struct Math: NumberProtocol {
         case .double(let v): return v
         case .bigInt(let v): return Double(String(v))
         case .bigDecimal(let v, let scale):
-            if let base = Double(String(v)) {
-                return base / pow(10.0, Double(scale))
-            }
-            return nil
+            guard let base = Double(String(v)) else { return nil }
+            return base / pow(10.0, Double(scale))
         }
     }
     
     public var asInt: Int? {
         switch storage {
         case .int(let v): return v
-        case .bigInt(let v): return Int(v)
         case .double(let v): return Int(v)
+        case .bigInt(let v): return Int(v)
         case .bigDecimal(let v, let scale):
             let divisor = pow(10.0, Double(scale))
             return Int((Double(String(v)) ?? 0) / divisor)
@@ -142,7 +183,7 @@ public struct Math: NumberProtocol {
     
     // MARK: - Initializers
     public init(integerLiteral value: Int) { self.storage = .int(value) }
-    public init(floatLiteral value: Double) { self.storage = value.isFinite ? .double(value) : .double(0) }
+    public init(floatLiteral value: Double) { self.storage = .double(value.isFinite ? value : 0) }
     
     public init(stringLiteral value: String) {
         if let intVal = Int(value) { self.storage = .int(intVal) }
@@ -151,13 +192,18 @@ public struct Math: NumberProtocol {
             let parts = value.split(separator: ".")
             let scale = parts[1].count
             let combined = parts.joined()
-            self.storage = .bigDecimal(BigInt(combined) ?? BigInt(0), scale: scale)
+            self.storage = .bigDecimal(BigInt(combined) ?? .zero, scale: scale)
         } else {
-            self.storage = .bigInt(BigInt(value) ?? BigInt(0))
+            self.storage = .bigInt(BigInt(value) ?? .zero)
         }
     }
     
     public init(_ value: Math) { self = value }
+    
+    // BigDecimal initializer
+    init(bigDecimal value: BigInt, scale: Int) {
+        self.storage = (scale == 0) ? .bigInt(value) : .bigDecimal(value, scale: scale)
+    }
     
     // MARK: - BigDecimal Helpers
     private func asBigDecimal() -> (BigInt, Int) {
@@ -168,10 +214,9 @@ public struct Math: NumberProtocol {
             if let dot = str.firstIndex(of: ".") {
                 let decimals = str.distance(from: dot, to: str.endIndex) - 1
                 let cleaned = str.replacingOccurrences(of: ".", with: "")
-                return (BigInt(cleaned) ?? BigInt(0), decimals)
-            } else {
-                return (BigInt(Int(v)), 0)
+                return (BigInt(cleaned) ?? .zero, decimals)
             }
+            return (BigInt(Int(v)), 0)
         case .bigInt(let v): return (v, 0)
         case .bigDecimal(let v, let scale): return (v, scale)
         }
@@ -181,8 +226,8 @@ public struct Math: NumberProtocol {
         let (lv, ls) = self.asBigDecimal()
         let (rv, rs) = other.asBigDecimal()
         if ls == rs { return (lv, rv, ls) }
-        else if ls > rs { return (lv, rv * BigInt(10).power(ls - rs), ls) }
-        else { return (lv * BigInt(10).power(rs - ls), rv, rs) }
+        if ls > rs { return (lv, rv * BigInt(10).power(ls - rs), ls) }
+        return (lv * BigInt(10).power(rs - ls), rv, rs)
     }
     
     // MARK: - Comparison Operators
@@ -234,48 +279,50 @@ public extension Math {
     static func *= (lhs: inout Math, rhs: Math) { lhs = lhs * rhs }
     static func /= (lhs: inout Math, rhs: Math) { lhs = lhs / rhs }
     static func %= (lhs: inout Math, rhs: Math) { lhs = lhs % rhs }
-    
-    // BigDecimal initializer
-    init(bigDecimal value: BigInt, scale: Int) {
-        self.storage = scale == 0 ? .bigInt(value) : .bigDecimal(value, scale: scale)
-    }
 }
 
-// MARK: - Hyperoperation Precedence Groups
+// MARK: - Hyperoperations
 precedencegroup ExponentiationPrecedence {
     higherThan: MultiplicationPrecedence
     associativity: right
 }
+
 precedencegroup TetrationPrecedence {
     higherThan: ExponentiationPrecedence
     associativity: right
 }
+
 precedencegroup PentationPrecedence {
     higherThan: TetrationPrecedence
     associativity: right
 }
+
 precedencegroup HexationPrecedence {
     higherThan: PentationPrecedence
     associativity: right
 }
+
 precedencegroup HeptationPrecedence {
     higherThan: HexationPrecedence
     associativity: right
 }
+
 precedencegroup OctationPrecedence {
     higherThan: HeptationPrecedence
     associativity: right
 }
+
 precedencegroup NonationPrecedence {
     higherThan: OctationPrecedence
     associativity: right
 }
+
 precedencegroup DekationPrecedence {
     higherThan: NonationPrecedence
     associativity: right
 }
 
-// Hyperoperation operators
+// Operators
 infix operator **: ExponentiationPrecedence
 infix operator ^^: TetrationPrecedence
 infix operator ^^^: PentationPrecedence
@@ -286,64 +333,53 @@ infix operator ^^^^^^^: NonationPrecedence
 infix operator ^^^^^^^^: DekationPrecedence
 
 public extension Math {
-    /// Recursive hyperoperation implementation. Level 2 = exponentiation, 3 = tetration, etc.
+    /// Generalized hyperoperation (level 2 = exponentiation, 3 = tetration, etc.)
     private static func hyper(_ a: Math, _ b: Math, level: Int) -> Math {
-        let n: Int
-        switch b.storage {
-        case .int(let v): n = v
-        case .bigInt(let v): n = Int(v)
-        case .double(let v): n = Int(v)
-        case .bigDecimal(let v, _): n = Int(v)
-        }
-        guard n > 0 else { return Math(integerLiteral: 1) }
-        
-        switch level {
-        case 2: return n == 1 ? a : a ** hyper(a, Math(integerLiteral: n - 1), level: 2)
-        case 3: return n == 1 ? a : a ** hyper(a, Math(integerLiteral: n - 1), level: 3)
-        case 4: return n == 1 ? a : hyper(a, hyper(a, Math(integerLiteral: n - 1), level: 3), level: 3)
-        case 5: return n == 1 ? a : hyper(a, hyper(a, Math(integerLiteral: n - 1), level: 4), level: 4)
-        case 6: return n == 1 ? a : hyper(a, hyper(a, Math(integerLiteral: n - 1), level: 5), level: 5)
-        case 7: return n == 1 ? a : hyper(a, hyper(a, Math(integerLiteral: n - 1), level: 6), level: 6)
-        case 8: return n == 1 ? a : hyper(a, hyper(a, Math(integerLiteral: n - 1), level: 7), level: 7)
-        case 9: return n == 1 ? a : hyper(a, hyper(a, Math(integerLiteral: n - 1), level: 8), level: 8)
-        default: return Math(integerLiteral: 0)
-        }
+        guard let n = b.asInt, n > 0 else { return 1 }
+        if n == 1 { return a }
+        return hyper(a, hyper(a, Math(integerLiteral: n - 1), level: level - 1), level: level - 1)
     }
     
-    static func ** (lhs: Math, rhs: Math) -> Math { let (lv, rv, scale) = lhs.align(rhs); return .init(bigDecimal: lv.power(Int(rv)), scale: scale) }
-    static func ^^ (lhs: Math, rhs: Math) -> Math { return hyper(lhs, rhs, level: 3) }
-    static func ^^^ (lhs: Math, rhs: Math) -> Math { return hyper(lhs, rhs, level: 4) }
-    static func ^^^^ (lhs: Math, rhs: Math) -> Math { return hyper(lhs, rhs, level: 5) }
-    static func ^^^^^ (lhs: Math, rhs: Math) -> Math { return hyper(lhs, rhs, level: 6) }
-    static func ^^^^^^ (lhs: Math, rhs: Math) -> Math { return hyper(lhs, rhs, level: 7) }
-    static func ^^^^^^^ (lhs: Math, rhs: Math) -> Math { return hyper(lhs, rhs, level: 8) }
-    static func ^^^^^^^^ (lhs: Math, rhs: Math) -> Math { return hyper(lhs, rhs, level: 9) }
+    static func ** (lhs: Math, rhs: Math) -> Math {
+        let (lv, rv, scale) = lhs.align(rhs)
+        return .init(bigDecimal: lv.power(Int(rv)), scale: scale)
+    }
+    static func ^^ (lhs: Math, rhs: Math) -> Math { hyper(lhs, rhs, level: 3) }
+    static func ^^^ (lhs: Math, rhs: Math) -> Math { hyper(lhs, rhs, level: 4) }
+    static func ^^^^ (lhs: Math, rhs: Math) -> Math { hyper(lhs, rhs, level: 5) }
+    static func ^^^^^ (lhs: Math, rhs: Math) -> Math { hyper(lhs, rhs, level: 6) }
+    static func ^^^^^^ (lhs: Math, rhs: Math) -> Math { hyper(lhs, rhs, level: 7) }
+    static func ^^^^^^^ (lhs: Math, rhs: Math) -> Math { hyper(lhs, rhs, level: 8) }
+    static func ^^^^^^^^ (lhs: Math, rhs: Math) -> Math { hyper(lhs, rhs, level: 9) }
 }
 
-// MARK: - Factorial Operator
+// MARK: - Factorial
 postfix operator ~!
 public extension Math {
-    /// Factorial of non-negative integers. Returns 1 for negative numbers.
+    /// Factorial of non-negative integers.
     static postfix func ~! (x: Math) -> Math {
-        guard case let .int(n) = x.storage, n >= 0 else { return Math(integerLiteral: 1) }
-        var result = 1
-        for i in 1...n { result *= i }
-        return Math(integerLiteral: result)
+        guard let n = x.asInt, n >= 0 else { return 1 }
+        var result = BigInt(1)
+        for i in 1...n { result *= BigInt(i) }
+        return Math(bigDecimal: result, scale: 0)
     }
 }
 
-// MARK: - Root Operator
+// MARK: - Roots
 infix operator |/: ExponentiationPrecedence
+infix operator √: ExponentiationPrecedence
+
 public extension Math {
-    /// Computes n-th root using iterative approximation. Only positive values.
+    /// Computes n-th root using Newton’s method. Only positive values.
     static func |/ (lhs: Math, rhs: Math) -> Math {
         guard rhs > 0 else { fatalError("Root degree must be positive") }
         guard lhs >= 0 else { fatalError("Cannot compute real root of negative number") }
-        
-        guard let lhsDouble = lhs.asDouble, let nDouble = rhs.asDouble else { fatalError("Cannot convert Math to Double for root calculation") }
+        guard let lhsDouble = lhs.asDouble, let nDouble = rhs.asDouble else {
+            fatalError("Cannot convert Math to Double for root calculation")
+        }
         
         var x = lhsDouble / nDouble
-        let iterations = min(Int(MathSettings.shared.percision.asDouble ?? 100), 10_000)
+        let iterations = min(Int(MathSettings.shared.precision.asDouble ?? 100), 10_000)
         let tolerance = 1e-12
         
         for _ in 0..<iterations {
@@ -351,13 +387,13 @@ public extension Math {
             x = ((nDouble - 1) * x + lhsDouble / pow(x, nDouble - 1)) / nDouble
             if abs(x - xPrev) < tolerance { break }
         }
-        
         return Math(floatLiteral: x)
     }
+    
+    static func √ (lhs: Math, rhs: Math) -> Math { lhs |/ rhs }
 }
 
 // MARK: - Numeric Conversions
-public extension Int { init(_ value: Math) { self = value.asInt ?? 0 } }
+public extension Int    { init(_ value: Math) { self = value.asInt ?? 0 } }
 public extension Double { init(_ value: Math) { self = value.asDouble ?? 0 } }
-public extension Float { init(_ value: Math) { self = value.asDouble.map(Float.init) ?? 0 } }
-
+public extension Float  { init(_ value: Math) { self = value.asDouble.map(Float.init) ?? 0 } }

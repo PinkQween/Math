@@ -35,7 +35,7 @@ public extension Math {
             rad = x
         }
 
-        let n = settings.percision
+        let n = settings.precision
 
         // 3. Compute sine using Taylor expansion
         var result: Math = 0
@@ -61,7 +61,7 @@ public extension Math {
             rad = x
         }
 
-        let n = MathSettings.shared.percision
+        let n = MathSettings.shared.precision
 
         // Compute cosine using Taylor expansion
         var result: Math = 0
@@ -90,7 +90,7 @@ public extension Math {
         var x = y
 
         // 3. Newton-Raphson iterations
-        let iterations = MathSettings.shared.percision
+        let iterations = MathSettings.shared.precision
         for _ in 0..<iterations {
             let f = Calculate(settings: .init(angleMode: .radians, precision: iterations)) {
                 sin(x)
