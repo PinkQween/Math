@@ -302,7 +302,6 @@ Please follow Apple's Swift API Design Guidelines and maintain the existing code
 ## 📝 Requirements
 
 - Swift 6.1+
-- iOS 13.0+ / macOS 10.15+ / Linux
 
 ## 📄 License
 
@@ -312,7 +311,6 @@ MIT License © 2025
 
 - Built with [BigInt](https://github.com/attaswift/BigInt) for arbitrary-precision arithmetic
 - Follows [Apple's Swift API Design Guidelines](https://swift.org/documentation/api-design-guidelines/)
-- Inspired by mathematical libraries from Python, Mathematica, and Haskell
 
 ## 📮 Contact
 
