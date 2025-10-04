@@ -10,7 +10,6 @@ import Foundation
 // MARK: - Special Number Classifications
 
 public extension Math {
-
     /// Returns `true` if this number is a perfect number.
     ///
     /// A perfect number equals the sum of its proper divisors (divisors excluding itself).

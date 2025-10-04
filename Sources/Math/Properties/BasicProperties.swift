@@ -10,7 +10,10 @@ import Foundation
 // MARK: - Basic Number Properties
 
 public extension Math {
-
+    var isInt: Bool {
+        return self % 1 == 0
+    }
+    
     /// Returns the parity of this value.
     ///
     /// - Returns: `.even` if the value is divisible by 2, otherwise `.odd`.
