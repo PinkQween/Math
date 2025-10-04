@@ -549,4 +549,183 @@ public struct PhysicsUnits {
 
     // Note: Celsius and Fahrenheit require offset conversions, not just multiplication
     // These are simplified - proper temperature conversion needs special handling
+
+    // MARK: - Capacitance
+
+    // Custom dimension for capacitance
+    private static let capacitanceDimension = DimensionID.custom(
+        CustomDimension(id: "capacitance", displayName: "Capacitance")
+    )
+
+    /// Farad - SI unit of capacitance
+    public static let farad = Unit(
+        name: "farad",
+        symbol: "F",
+        dimension: capacitanceDimension,
+        toBaseScale: Math(1.0),
+        minimalExponents: [.time: 4, .mass: -1, .length: -2],
+        notes: "SI unit of electrical capacitance (C/V)"
+    )
+
+    /// Millifarad
+    public static let millifarad = Unit(
+        name: "millifarad",
+        symbol: "mF",
+        dimension: capacitanceDimension,
+        toBaseScale: Math(1e-3),
+        minimalExponents: [.time: 4, .mass: -1, .length: -2],
+        notes: "10⁻³ farad"
+    )
+
+    /// Microfarad
+    public static let microfarad = Unit(
+        name: "microfarad",
+        symbol: "μF",
+        dimension: capacitanceDimension,
+        toBaseScale: Math(1e-6),
+        minimalExponents: [.time: 4, .mass: -1, .length: -2],
+        notes: "10⁻⁶ farad"
+    )
+
+    /// Nanofarad
+    public static let nanofarad = Unit(
+        name: "nanofarad",
+        symbol: "nF",
+        dimension: capacitanceDimension,
+        toBaseScale: Math(1e-9),
+        minimalExponents: [.time: 4, .mass: -1, .length: -2],
+        notes: "10⁻⁹ farad"
+    )
+
+    /// Picofarad
+    public static let picofarad = Unit(
+        name: "picofarad",
+        symbol: "pF",
+        dimension: capacitanceDimension,
+        toBaseScale: Math(1e-12),
+        minimalExponents: [.time: 4, .mass: -1, .length: -2],
+        notes: "10⁻¹² farad"
+    )
+
+    // MARK: - Inductance
+
+    // Custom dimension for inductance
+    private static let inductanceDimension = DimensionID.custom(
+        CustomDimension(id: "inductance", displayName: "Inductance")
+    )
+
+    /// Henry - SI unit of inductance
+    public static let henry = Unit(
+        name: "henry",
+        symbol: "H",
+        dimension: inductanceDimension,
+        toBaseScale: Math(1.0),
+        minimalExponents: [.length: 2, .mass: 1, .time: -2],
+        notes: "SI unit of electrical inductance (Wb/A)"
+    )
+
+    /// Millihenry
+    public static let millihenry = Unit(
+        name: "millihenry",
+        symbol: "mH",
+        dimension: inductanceDimension,
+        toBaseScale: Math(1e-3),
+        minimalExponents: [.length: 2, .mass: 1, .time: -2],
+        notes: "10⁻³ henry"
+    )
+
+    /// Microhenry
+    public static let microhenry = Unit(
+        name: "microhenry",
+        symbol: "μH",
+        dimension: inductanceDimension,
+        toBaseScale: Math(1e-6),
+        minimalExponents: [.length: 2, .mass: 1, .time: -2],
+        notes: "10⁻⁶ henry"
+    )
+
+    // MARK: - Force
+
+    /// Newton - SI unit of force
+    public static let newton = Unit(
+        name: "newton",
+        symbol: "N",
+        dimension: .standard(.force),
+        toBaseScale: Math(1.0),
+        notes: "SI unit of force (kg⋅m/s²)"
+    )
+
+    /// Kilonewton
+    public static let kilonewton = Unit(
+        name: "kilonewton",
+        symbol: "kN",
+        dimension: .standard(.force),
+        toBaseScale: Math(1000.0),
+        notes: "10³ newtons"
+    )
+
+    /// Meganewton
+    public static let meganewton = Unit(
+        name: "meganewton",
+        symbol: "MN",
+        dimension: .standard(.force),
+        toBaseScale: Math(1e6),
+        notes: "10⁶ newtons"
+    )
+
+    /// Dyne - CGS unit of force
+    public static let dyne = Unit(
+        name: "dyne",
+        symbol: "dyn",
+        dimension: .standard(.force),
+        toBaseScale: Math(1e-5),
+        notes: "CGS unit (10⁻⁵ N)"
+    )
+
+    /// Pound-force
+    public static let poundForce = Unit(
+        name: "pound-force",
+        symbol: "lbf",
+        dimension: .standard(.force),
+        toBaseScale: Math(4.448222),
+        notes: "≈ 4.448 N (force of gravity on 1 lb mass)"
+    )
+
+    // MARK: - Amount of Substance
+
+    /// Mole - SI base unit of amount of substance
+    public static let mole = Unit(
+        name: "mole",
+        symbol: "mol",
+        dimension: .standard(.amountOfSubstance),
+        toBaseScale: Math(1.0),
+        notes: "SI base unit (6.022×10²³ entities)"
+    )
+
+    /// Millimole
+    public static let millimole = Unit(
+        name: "millimole",
+        symbol: "mmol",
+        dimension: .standard(.amountOfSubstance),
+        toBaseScale: Math(1e-3),
+        notes: "10⁻³ mole"
+    )
+
+    /// Micromole
+    public static let micromole = Unit(
+        name: "micromole",
+        symbol: "μmol",
+        dimension: .standard(.amountOfSubstance),
+        toBaseScale: Math(1e-6),
+        notes: "10⁻⁶ mole"
+    )
+
+    /// Kilomole
+    public static let kilomole = Unit(
+        name: "kilomole",
+        symbol: "kmol",
+        dimension: .standard(.amountOfSubstance),
+        toBaseScale: Math(1000.0),
+        notes: "10³ moles"
+    )
 }

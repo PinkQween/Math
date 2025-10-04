@@ -3,7 +3,7 @@
 **Math** is a comprehensive Swift library for advanced mathematical computations with arbitrary precision, extensive number properties, and a complete units system. Built following Apple's coding standards with a clean, modular architecture.
 
 [![Swift](https://img.shields.io/badge/Swift-6.1-orange.svg)](https://swift.org)
-[![Platform](https://img.shields.io/badge/platform-DarwinOS%20%7C%20Linux-lightgrey.svg)](https://github.com/PinkQween/Math)
+[![Platform](https://img.shields.io/badge/platform-Darwin%20%7C%20Linux-lightgrey.svg)](https://github.com/PinkQween/Math)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ## ✨ Features
