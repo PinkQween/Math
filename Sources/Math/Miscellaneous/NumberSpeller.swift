@@ -190,11 +190,6 @@ public struct NumberSpeller {
     }
 
     private static func spellThreeDigits(_ number: Math, mode: PronunciationMode) -> String {
-        let aviationMap: [Int: String] = [
-            0: "zero", 1: "one", 2: "two", 3: "tree", 4: "four",
-            5: "fife", 6: "six", 7: "seven", 8: "eight", 9: "niner"
-        ]
-        
         let numStr = number.description
         guard numStr != "0" else { return "" }
 
@@ -211,28 +206,30 @@ public struct NumberSpeller {
                 parts.append("\(hundreds) hundred")
             }
 
-            // Tens and units
-            let tensDigit = Int(String(digits[1]))!
-            let unitsDigit = Int(String(digits[2]))!
-
-            if tensDigit == 1 { // 10-19
-                if let teen = SmallNumbers.names[10 + unitsDigit] {
+            // Tens and units as string
+            let tensUnitsStr = String(digits[1...2])
+            if tensUnitsStr.first == "1" { // 10-19
+                if let teen = SmallNumbers.names[Int(tensUnitsStr)!] {
                     parts.append(teen)
                 }
             } else {
-                if tensDigit > 1, let tensStr = TensNumbers.names[tensDigit * 10] {
+                if let tensDigit = Int(String(digits[1])), tensDigit > 1,
+                   let tensStr = TensNumbers.names[tensDigit * 10] {
                     parts.append(tensStr)
                 }
-                if unitsDigit > 0, let unitsStr = SmallNumbers.names[unitsDigit] {
+                if let unitsDigit = Int(String(digits[2])), unitsDigit > 0,
+                   let unitsStr = SmallNumbers.names[unitsDigit] {
                     parts.append(unitsStr)
                 }
             }
 
         case .aviation:
+            let aviationMap: [Character: String] = [
+                "0": "zero", "1": "one", "2": "two", "3": "tree", "4": "four",
+                "5": "fife", "6": "six", "7": "seven", "8": "eight", "9": "niner"
+            ]
             for digitChar in numStr {
-                if let digit = Int(String(digitChar)) {
-                    parts.append(aviationMap[digit] ?? String(digit))
-                }
+                parts.append(aviationMap[digitChar] ?? String(digitChar))
             }
         }
 
