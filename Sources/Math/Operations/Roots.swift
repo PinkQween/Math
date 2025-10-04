@@ -29,7 +29,7 @@ public extension Math {
         // Special cases
         if nDouble == 1 { return lhs }
         if lhsDouble == 0 { return Math(0) }
-        if nDouble == 2 { return Math(floatLiteral: sqrt(lhsDouble)) }
+        if nDouble == 2 { return Math(floatLiteral: Foundation.sqrt(lhsDouble)) }
 
         // Use Swift's pow for direct calculation
         let result = pow(lhsDouble, 1.0 / nDouble)

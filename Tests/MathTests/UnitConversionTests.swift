@@ -113,4 +113,122 @@ struct UnitConversionTests {
 
         #expect(kilograms == nil)
     }
+
+    // MARK: - Temperature Conversions
+
+    @Test("Convert Celsius to Fahrenheit")
+    func testCelsiusToFahrenheit() async throws {
+        let celsius = MathUnit(Math(0), StandardUnits.celsius)
+        let fahrenheit = StandardUnits.celsius.convertWithinDimension(celsius, to: StandardUnits.fahrenheit)
+
+        #expect(fahrenheit != nil)
+        // 0°C = 32°F
+        let diff = abs(Double(fahrenheit!.value - Math(32)))
+        #expect(diff < 0.001)
+    }
+
+    @Test("Convert Fahrenheit to Celsius")
+    func testFahrenheitToCelsius() async throws {
+        let fahrenheit = MathUnit(Math(212), StandardUnits.fahrenheit)
+        let celsius = StandardUnits.fahrenheit.convertWithinDimension(fahrenheit, to: StandardUnits.celsius)
+
+        #expect(celsius != nil)
+        // 212°F = 100°C
+        let diff = abs(Double(celsius!.value - Math(100)))
+        #expect(diff < 0.001)
+    }
+
+    // MARK: - Speed Conversions
+
+    @Test("Convert km/h to mph")
+    func testKilometersPerHourToMilesPerHour() async throws {
+        let kmh = MathUnit(Math(100), StandardUnits.kilometersPerHour)
+        let mph = StandardUnits.kilometersPerHour.convertWithinDimension(kmh, to: StandardUnits.milesPerHour)
+
+        #expect(mph != nil)
+        // 100 km/h ≈ 62.137 mph
+        let diff = abs(Double(mph!.value - Math(62.137)))
+        #expect(diff < 0.01)
+    }
+
+    // MARK: - Data Storage Conversions
+
+    @Test("Convert MB to GB")
+    func testMegabytesToGigabytes() async throws {
+        let megabytes = MathUnit(Math(1000), StandardUnits.megabyte)
+        let gigabytes = StandardUnits.megabyte.convertWithinDimension(megabytes, to: StandardUnits.gigabyte)
+
+        #expect(gigabytes != nil)
+        #expect(gigabytes!.value == Math(1))
+    }
+
+    @Test("Convert GiB to bytes")
+    func testGibibytesToBytes() async throws {
+        let gibibytes = MathUnit(Math(1), StandardUnits.gibibyte)
+        let bytes = StandardUnits.gibibyte.convertWithinDimension(gibibytes, to: StandardUnits.byte)
+
+        #expect(bytes != nil)
+        #expect(bytes!.value == Math(1_073_741_824))
+    }
+
+    // MARK: - Pressure Conversions
+
+    @Test("Convert atmospheres to PSI")
+    func testAtmospheresToPSI() async throws {
+        let atm = MathUnit(Math(1), StandardUnits.atmosphere)
+        let psi = StandardUnits.atmosphere.convertWithinDimension(atm, to: StandardUnits.psi)
+
+        #expect(psi != nil)
+        // 1 atm = 101325 Pa / 6894.757 Pa/psi ≈ 14.696 psi
+        let expected = Math(101325.0) / Math(6894.757293168)
+        let diff = abs(Double(psi!.value - expected))
+        #expect(diff < 0.1)
+    }
+
+    // MARK: - Energy Conversions
+
+    @Test("Convert kWh to joules")
+    func testKilowattHoursToJoules() async throws {
+        let kwh = MathUnit(Math(1), StandardUnits.kilowattHour)
+        let joules = StandardUnits.kilowattHour.convertWithinDimension(kwh, to: StandardUnits.joule)
+
+        #expect(joules != nil)
+        #expect(joules!.value == Math(3_600_000))
+    }
+
+    @Test("Convert calories to joules")
+    func testCaloriesToJoules() async throws {
+        let calories = MathUnit(Math(1), StandardUnits.calorie)
+        let joules = StandardUnits.calorie.convertWithinDimension(calories, to: StandardUnits.joule)
+
+        #expect(joules != nil)
+        // 1 cal = 4.184 J
+        #expect(joules!.value == Math(4.184))
+    }
+
+    // MARK: - Power Conversions
+
+    @Test("Convert horsepower to watts")
+    func testHorsepowerToWatts() async throws {
+        let hp = MathUnit(Math(1), StandardUnits.horsepower)
+        let watts = StandardUnits.horsepower.convertWithinDimension(hp, to: StandardUnits.watt)
+
+        #expect(watts != nil)
+        // 1 hp ≈ 745.7 W
+        let diff = abs(Double(watts!.value - Math(745.7)))
+        #expect(diff < 0.1)
+    }
+
+    // MARK: - Angle Conversions
+
+    @Test("Convert degrees to radians")
+    func testDegreesToRadians() async throws {
+        let degrees = MathUnit(Math(180), StandardUnits.degree)
+        let radians = StandardUnits.degree.convertWithinDimension(degrees, to: StandardUnits.radian)
+
+        #expect(radians != nil)
+        // 180° = π rad ≈ 3.14159
+        let diff = abs(Double(radians!.value - Math(3.14159)))
+        #expect(diff < 0.001)
+    }
 }

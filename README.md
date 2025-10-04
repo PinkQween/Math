@@ -28,11 +28,13 @@
 - **Number tests**: palindrome, happy, narcissistic, Harshad, Keith
 - **Basic properties**: parity, sign, even/odd detection
 
-### 📏 157 Units of Measurement
-- **Standard units**: meters, feet, liters, pounds, etc.
+### 📏 200+ Units of Measurement
+- **Standard units**: length, mass, time, temperature, speed, pressure, energy, power, angles, frequency
+- **Data storage**: bytes, KB/MB/GB (decimal) and KiB/MiB/GiB (binary)
 - **Physics units**: watts, amps, volts, joules, hertz, planck constants
 - **Exotic units**: parsecs, smoots, furlongs, hogsheads, astronomical units
-- **Automatic conversion** between compatible units
+- **Temperature conversions**: Celsius, Fahrenheit, Kelvin with proper offset handling
+- **Automatic conversion** between compatible units with dimensional analysis
 
 ### 🗣️ Number Pronunciation
 - **Spell out numbers** in English ("forty two")
@@ -178,22 +180,34 @@ Math(1000).isPowerOfTen          // true (10³)
 
 ```swift
 // Length conversions
-let km = StandardUnits.kilometer
-let mi = StandardUnits.mile
-km.convert(10, to: mi)    // 6.21371 miles
+let meters = MathUnit(Math(100), StandardUnits.meter)
+let feet = StandardUnits.meter.convertWithinDimension(meters, to: StandardUnits.foot)
+print(feet?.value)  // 328.084 ft
 
-// Physics units
-let kW = PhysicsUnits.kilowatt
-let hp = PhysicsUnits.horsepower
-kW.convert(100, to: hp)   // ~134 horsepower
+// Temperature (with offset handling)
+let celsius = MathUnit(Math(0), StandardUnits.celsius)
+let fahrenheit = StandardUnits.celsius.convertWithinDimension(celsius, to: StandardUnits.fahrenheit)
+print(fahrenheit?.value)  // 32°F
 
-// Exotic units
-let ly = ExoticUnits.lightYear
-let pc = ExoticUnits.parsec
-ly.convert(1, to: pc)     // ~0.306 parsecs
+// Data storage
+let megabytes = MathUnit(Math(1000), StandardUnits.megabyte)
+let gigabytes = StandardUnits.megabyte.convertWithinDimension(megabytes, to: StandardUnits.gigabyte)
+print(gigabytes?.value)  // 1 GB
 
-// View unit information
-print(ExoticUnits.smoot)  // "smoot (sm) - ≈ 5'7" (Harvard Bridge = 364.4 smoots)"
+// Binary vs decimal
+let gb = MathUnit(Math(1), StandardUnits.gigabyte)  // 1,000,000,000 bytes
+let gib = StandardUnits.gigabyte.convertWithinDimension(gb, to: StandardUnits.gibibyte)
+print(gib?.value)  // 0.931 GiB (1,073,741,824 bytes)
+
+// Speed
+let kmh = MathUnit(Math(100), StandardUnits.kilometersPerHour)
+let mph = StandardUnits.kilometersPerHour.convertWithinDimension(kmh, to: StandardUnits.milesPerHour)
+print(mph?.value)  // 62.137 mph
+
+// Energy for fitness apps
+let calories = MathUnit(Math(500), StandardUnits.kilocalorie)
+let joules = StandardUnits.kilocalorie.convertWithinDimension(calories, to: StandardUnits.joule)
+print(joules?.value)  // 2,092,000 J
 ```
 
 ### Settings & Configuration
@@ -223,7 +237,9 @@ Sources/Math/
 │   ├── Arithmetic.swift    # +, -, *, /, %
 │   ├── Hyperoperations.swift  # **, ^^, ^^^
 │   ├── Factorial.swift     # !, !!, !!!
-│   └── Roots.swift         # nth roots
+│   ├── Roots.swift         # nth roots
+│   └── Trigonometry/       # Trig functions
+│       └── Trigonometry.swift  # sin, cos, tan, etc.
 │
 ├── Properties/              # 50+ number properties
 │   ├── BasicProperties.swift   # parity, sign, etc.
@@ -231,20 +247,31 @@ Sources/Math/
 │   ├── SpecialNumbers.swift   # 20+ classifications
 │   └── Pronunciation.swift    # Spell out numbers
 │
-├── Units/                   # 157 measurement units
+├── Units/                   # 200+ measurement units
 │   ├── Unit.swift          # Core unit system
-│   ├── StandardUnits.swift # Meters, feet, liters
-│   ├── PhysicsUnits.swift  # Watts, amps, joules
+│   ├── MathUnit.swift      # Value + Unit wrapper
+│   ├── StandardUnits.swift # Length, mass, time, temp, speed, data, pressure, energy, etc.
+│   ├── PhysicsUnits.swift  # Watts, amps, volts, planck constants
 │   └── ExoticUnits.swift   # Parsecs, smoots, etc.
 │
 ├── Definitions/             # Basic enums
-│   ├── Parity.swift
-│   └── Sign.swift
+│   ├── Parity.swift        # Even/odd
+│   └── Sign.swift          # Positive/negative/zero
 │
-├── Constants/               # Mathematical constants
-├── Algebra/                 # Linear algebra (Matrix)
-├── Miscellaneous/           # NumberSpeller
-└── Geometry.swift           # Trigonometry
+├── Constants/               # Mathematical & physical constants
+│   ├── Math/               # π, e, √2, √3, etc.
+│   └── Physics/            # Speed of light, Planck, Hubble
+│
+├── Algebra/                 # Linear algebra
+│   └── Linear/
+│       ├── Matrices.swift  # Matrix operations
+│       └── Vertices.swift  # Vector operations
+│
+├── Miscellaneous/           # Utilities
+│   └── NumberSpeller.swift # Spell numbers in English
+│
+└── Imported/                # BigInt implementation
+    └── BigInt.swift         # Arbitrary-precision integers
 ```
 
 ## 🎯 Use Cases

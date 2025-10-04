@@ -12,6 +12,11 @@ import Foundation
 
 public extension Math {
 
+    /// Unary negation operator.
+    static prefix func - (value: Math) -> Math {
+        return Math(0) - value
+    }
+
     static func + (lhs: Math, rhs: Math) -> Math {
         let (lv, rv, scale) = lhs.align(rhs)
         return .init(bigDecimal: lv + rv, scale: scale)

@@ -1,30 +1,59 @@
-// Unit.swift
-// Math
 //
-// Full, extensible unit system with:
-//  - a tiny minimal basis (length, mass, time)
-//  - an exhaustive standard-dimension enum
-//  - custom dimensions via a registry (keeps switches exhaustive)
-//  - numeric kinds (real/imaginary/complex/abstract)
-//  - affine units (scale + offset) and compound units
-//  - Planck / minimal-basis helpers
+//  Unit.swift
+//  Math
 //
-// Created by Hanna Skairipa on 10/3/25.
+//  A comprehensive, extensible unit system supporting dimensional analysis,
+//  unit conversions, and arbitrary-precision calculations.
+//
+//  Created by Hanna Skairipa on 10/3/25.
 //
 
 import Foundation
 
-// MARK: - Minimal basis (irreducible)
+// MARK: - Minimal Basis
+
+/// The minimal irreducible dimensional basis for physical quantities.
+///
+/// All physical dimensions can be expressed as combinations of these three fundamental dimensions.
+/// This forms the basis for dimensional analysis and ensures type safety in calculations.
+///
+/// ## Example
+/// ```swift
+/// // Force has dimensions [mass * length / time^2]
+/// let force: [MinimalDimension: Int] = [.mass: 1, .length: 1, .time: -2]
+/// ```
+///
+/// - SeeAlso: `StandardDimension`, `DimensionID`
 public enum MinimalDimension: String, CaseIterable, Sendable {
-    case length, mass, time
+    /// Spatial extent (meter)
+    case length
+
+    /// Quantity of matter (kilogram)
+    case mass
+
+    /// Duration (second)
+    case time
 }
 
-// MARK: - Standard (exhaustive) dimensions
+// MARK: - Standard Dimensions
+
+/// Standard physical dimensions covering common measurement categories.
+///
+/// This enum provides an exhaustive list of commonly-used dimensions, including:
+/// - SI base dimensions (length, mass, time, temperature, etc.)
+/// - Derived dimensions (area, volume, speed, force, energy, etc.)
+/// - Specialized dimensions (angle, dataStorage, fuelEconomy, etc.)
+///
+/// Each dimension can be decomposed into combinations of `MinimalDimension` values
+/// for dimensional analysis and validation.
+///
+/// - SeeAlso: `MinimalDimension`, `CustomDimension`, `Unit`
 public enum StandardDimension: String, CaseIterable, Sendable {
     case length, mass, time
     case electricCurrent, temperature, amountOfSubstance, luminousIntensity
     case area, volume, speed, acceleration, force, energy, power, electricCharge
     case voltage, electricalResistance, frequency, pressure, angle, informationStorage
+    case dataStorage, fuelEconomy
 }
 
 // MARK: - Custom dimension metadata
@@ -105,6 +134,8 @@ public extension StandardDimension {
         case .pressure:     return [.mass: 1, .length: -1, .time: -2]
         case .angle:        return [:]
         case .informationStorage: return [:]
+        case .dataStorage:  return [:]
+        case .fuelEconomy:  return [.length: -2]
         case .electricCharge, .electricCurrent, .voltage, .electricalResistance, .temperature, .amountOfSubstance, .luminousIntensity:
             return nil
         }
