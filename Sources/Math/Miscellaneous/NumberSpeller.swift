@@ -66,9 +66,8 @@ public struct NumberSpeller {
         var result = spelledInteger
         
         if !fractionPart.isEmpty {
-            let fractionDecimal = Decimal(string: "0." + fractionPart) ?? 0
             let conjunction = mode == .aviation ? "point" : "and"
-            let fractionSpelling = Self.pronounceFraction(fractionDecimal, mode: mode)
+            let fractionSpelling = Self.pronounceFraction(from: fractionPart, mode: mode)
             result += " \(conjunction) \(fractionSpelling)"
         }
         
@@ -122,9 +121,8 @@ public struct NumberSpeller {
         var result = spelledInteger
         
         if !fractionPart.isEmpty {
-            let fractionDecimal = Decimal(string: "0." + fractionPart) ?? 0
             let conjunction = mode == .aviation ? "point" : "and"
-            let fractionSpelling = Self.pronounceFraction(fractionDecimal, mode: mode)
+            let fractionSpelling = Self.pronounceFraction(from: fractionPart, mode: mode)
             result += " \(conjunction) \(fractionSpelling)"
         }
         
@@ -141,15 +139,22 @@ public struct NumberSpeller {
     private static func splitIntoThreeDigitGroups(_ numberString: String) -> [String] {
         var groups: [String] = []
         var current = numberString
-        
+
         while !current.isEmpty {
             let endIndex = current.index(current.endIndex, offsetBy: -3, limitedBy: current.startIndex) ?? current.startIndex
             let group = String(current[endIndex..<current.endIndex])
             groups.insert(group, at: 0)
             current = String(current[..<endIndex])
         }
-        
-        return groups.map { String(repeating: "0", count: 3 - $0.count) + $0 }
+
+        // Pad only middle/right groups, strip leading zeros from first
+        return groups.enumerated().map { index, group in
+            if index == 0 {
+                return group.isEmpty ? "0" : group // don't trim leading zeros
+            } else {
+                return String(repeating: "0", count: 3 - group.count) + group
+            }
+        }
     }
     
     /// Spells out integer groups with appropriate large number suffixes.
@@ -157,30 +162,20 @@ public struct NumberSpeller {
         var spelledParts: [String] = []
 
         for (index, groupStr) in groups.enumerated() {
-            let groupNum = Math(stringLiteral: groupStr)
-            guard groupNum > 0 else { continue }
-
+            let groupInt = Int(groupStr) ?? 0
+            guard groupInt > 0 else { continue }
+            
             let groupName = spellThreeDigits(groupStr, mode: mode)
             let positionFromRight = groups.count - index - 1
-
+            
             let suffix: String
-            switch mode {
-            case .aviation:
-                switch positionFromRight {
-                case 0: suffix = ""
-                case 1: suffix = " thousand"
-                case 2: suffix = " million"
-                case 3: suffix = " billion"
-                default:
-                    suffix = " " + LargeNumber.name(forIndex: Math(integerLiteral: positionFromRight))
-                }
-            case .normal:
-                switch positionFromRight {
-                case 0: suffix = ""
-                case 1: suffix = " thousand"
-                default:
-                    suffix = " " + LargeNumber.name(forIndex: Math(integerLiteral: positionFromRight - 1))
-                }
+            switch positionFromRight {
+            case 0: suffix = ""
+            case 1: suffix = " thousand"
+            case 2: suffix = " million"
+            case 3: suffix = " billion"
+            case 4: suffix = " trillion"
+            default: suffix = " " + LargeNumber.name(forIndex: Math(integerLiteral: positionFromRight))
             }
 
             spelledParts.append(groupName + suffix)
@@ -190,97 +185,110 @@ public struct NumberSpeller {
     }
 
     private static func spellThreeDigits(_ numberStr: String, mode: PronunciationMode) -> String {
-        guard numberStr != "000" else { return "" }
-
+        guard !numberStr.isEmpty, numberStr != "000" else { return "" }
+        
         var parts: [String] = []
-
+        
         switch mode {
         case .normal:
-            let digits = Array(numberStr)
-
+            // Pad to 3 digits
+            let padded = String(repeating: "0", count: 3 - numberStr.count) + numberStr
+            guard padded.count == 3 else { return "" }
+            
+            let hundredsDigit = padded[padded.startIndex]
+            let tensDigit = padded[padded.index(padded.startIndex, offsetBy: 1)]
+            let unitsDigit = padded[padded.index(padded.startIndex, offsetBy: 2)]
+            
             // Hundreds
-            if digits[0] != "0" {
-                if let hundreds = SmallNumbers.names[Int(String(digits[0]))!] {
-                    parts.append("\(hundreds) hundred")
-                }
+            if hundredsDigit != "0", let hundredsName = SmallNumbers.names[Int(String(hundredsDigit))!] {
+                parts.append("\(hundredsName) hundred")
             }
-
+            
             // Tens + Units
-            let tensDigit = digits[1]
-            let unitsDigit = digits[2]
-
             if tensDigit == "1" { // 10-19
-                let teenIndex = Int(String("\(tensDigit)\(unitsDigit)"))!
-                if let teenName = SmallNumbers.names[teenIndex] {
+                if let teenName = SmallNumbers.names[Int(String(tensDigit) + String(unitsDigit))!] {
                     parts.append(teenName)
                 }
             } else {
-                if tensDigit != "0", let tensName = TensNumbers.names[Int(String(tensDigit))! * 10] {
+                if tensDigit != "0", let tensName = TensNumbers.names[(Int(String(tensDigit)) ?? 0) * 10] {
                     parts.append(tensName)
                 }
                 if unitsDigit != "0", let unitsName = SmallNumbers.names[Int(String(unitsDigit))!] {
                     parts.append(unitsName)
                 }
             }
-
-        case .aviation:
-            let aviationMap: [Character: String] = [
-                "0": "zero", "1": "one", "2": "two", "3": "tree", "4": "four",
-                "5": "fife", "6": "six", "7": "seven", "8": "eight", "9": "niner"
-            ]
-            for digitChar in numberStr {
-                parts.append(aviationMap[digitChar] ?? String(digitChar))
-            }
-        }
-
-        return parts.joined(separator: " ")
-    }
-
-    /// Pronounces the fractional part of a decimal number.
-    private static func pronounceFraction(_ fraction: Decimal, mode: PronunciationMode) -> String {
-        let fractionString = fraction.description.dropFirst(2) // Remove "0."
-        guard !fractionString.isEmpty else { return "" }
-        
-        switch mode {
+            
         case .aviation:
             let aviationMap: [Character: String] = [
                 "0": "zero", "1": "one", "2": "two", "3": "tree",
                 "4": "four", "5": "fife", "6": "six", "7": "seven",
                 "8": "eight", "9": "niner"
             ]
-            return fractionString.map { aviationMap[$0] ?? String($0) }.joined(separator: " ")
-            
-        case .normal:
-            let numeratorStr = String(fractionString)
-            let numeratorName = spellNumber(from: numeratorStr, mode: .normal)
-            let denominatorPower = fractionString.count
-            let denominatorName = fractionDenominatorName(forPower: denominatorPower)
-            let pluralSuffix = numeratorStr != "1" ? "s" : ""
-            
-            return "\(numeratorName) \(denominatorName)\(pluralSuffix)"
+            for c in numberStr {
+                parts.append(aviationMap[c] ?? String(c))
+            }
         }
+        
+        return parts.joined(separator: " ")
     }
     
-    /// Returns the denominator name for a fractional power of ten.
-    private static func fractionDenominatorName(forPower power: Int) -> String {
+    private static func spellIntegerWithoutSuffix(_ numberString: String) -> String {
+        // Remove leading zeros to avoid weird readings like "zero hundred"
+        let trimmed = numberString.trimmingCharacters(in: CharacterSet(charactersIn: "0"))
+        guard !trimmed.isEmpty else { return "zero" }
+        
+        let groups = splitIntoThreeDigitGroups(trimmed)
+        
+        // Use the existing spellThreeDigits but **don’t add thousand/million/etc suffixes**
+        return groups.map { spellThreeDigits($0, mode: .normal) }.joined(separator: " ")
+    }
+    
+    /// Pronounces the fractional part of a decimal number.
+    private static func pronounceFraction(from fractionString: String, mode: PronunciationMode) -> String {
+        guard !fractionString.isEmpty else { return "" }
+
+        switch mode {
+        case .aviation:
+            let map: [Character: String] = ["0":"zero","1":"one","2":"two","3":"tree","4":"four","5":"fife","6":"six","7":"seven","8":"eight","9":"niner"]
+            return fractionString.map { map[$0]! }.joined(separator: " ")
+
+        case .normal:
+            // Treat the fraction as a single integer
+            let numeratorSpelling = spellLargeIntegerString(fractionString)
+            let numeratorValue = Int(fractionString) ?? 0
+            let isPlural = numeratorValue != 1
+            let denominator = fractionDenominatorName(forPower: fractionString.count, plural: isPlural)
+            return "\(numeratorSpelling) \(denominator)"
+        }
+    }
+
+    // Spell a numeric string (any length) without losing digits
+    private static func spellLargeIntegerString(_ str: String) -> String {
+        let groups = splitIntoThreeDigitGroups(str)
+        return spellIntegerGroups(groups, mode: .normal)
+    }
+
+    // Correct fraction denominator
+    private static func fractionDenominatorName(forPower power: Int, plural: Bool = false) -> String {
+        let singular: String
         switch power {
-        case 1: return "tenth"
-        case 2: return "hundredth"
-        case 3: return "thousandth"
-        case 4: return "ten-thousandth"
-        case 5: return "hundred-thousandth"
-        case 6: return "millionth"
-        case 7: return "ten-millionth"
-        case 8: return "hundred-millionth"
-        case 9: return "billionth"
-        case 10: return "ten-billionth"
-        case 11: return "hundred-billionth"
-        case 12: return "trillionth"
+        case 1: singular = "tenth"
+        case 2: singular = "hundredth"
+        case 3: singular = "thousandth"
+        case 4: singular = "ten-thousandth"
+        case 5: singular = "hundred-thousandth"
+        case 6: singular = "millionth"
+        case 7: singular = "ten-millionth"
+        case 8: singular = "hundred-millionth"
+        case 9: singular = "billionth"
+        case 10: singular = "ten-billionth"
+        case 11: singular = "hundred-billionth"
+        case 12: singular = "trillionth"
         default:
             let illionIndex = (power - 3) / 3
             let remainder = (power - 3) % 3
 
-            let base = LargeNumber.name(forIndex: Math(integerLiteral: illionIndex + 1)) // million = 10^6
+            let base = LargeNumber.name(forIndex: Math(integerLiteral: illionIndex + 1))
             let prefix: String
             switch remainder {
             case 0: prefix = ""
@@ -288,8 +296,61 @@ public struct NumberSpeller {
             case 2: prefix = "hundred-"
             default: prefix = ""
             }
-            return "\(prefix)\(base)th"
+            singular = "\(prefix)\(base)th"
         }
+        
+        return plural ? singular + "s" : singular
+    }
+    
+    private static func spellFractionalNumber(_ string: String) -> String {
+        // Ensure no leading zeros in the fractional numerator
+        let trimmed = string.trimmingCharacters(in: CharacterSet(charactersIn: "0"))
+        guard !trimmed.isEmpty else { return "zero" }
+        
+        // Pad string to a multiple of 3 for proper grouping
+        let padCount = (3 - (trimmed.count % 3)) % 3
+        let padded = String(repeating: "0", count: padCount) + trimmed
+        
+        // Split into 3-digit groups
+        var groups: [String] = []
+        var current = padded
+        while !current.isEmpty {
+            let endIndex = current.index(current.startIndex, offsetBy: 3)
+            let group = String(current[..<endIndex])
+            groups.append(group)
+            current = String(current[endIndex...])
+        }
+        
+        // Spell each group with proper position scaling
+        var parts: [String] = []
+        for (i, group) in groups.enumerated() {
+            let number = Math(stringLiteral: group)
+            guard number > 0 else { continue }
+
+            let groupSpelling = spellThreeDigits(String(number.asInt ?? 0), mode: .normal)
+            
+            // Determine suffix
+            let power = groups.count - i - 1
+            let suffix = power > 0 ? " " + LargeNumber.name(forIndex: Math(integerLiteral: power - 1)) : ""
+            
+            parts.append(groupSpelling + suffix)
+        }
+        
+        return parts.joined(separator: " ")
+    }
+    
+    private static func spellThreeDigitsOrLarger(_ number: Int) -> String {
+        if number == 0 { return "zero" }
+
+        var parts: [String] = []
+        var n = number
+        let millions = n / 1_000_000
+        if millions > 0 { parts.append(spellThreeDigits(String(millions), mode: .normal) + " million"); n %= 1_000_000 }
+        let thousands = n / 1_000
+        if thousands > 0 { parts.append(spellThreeDigits(String(thousands), mode: .normal) + " thousand"); n %= 1_000 }
+        if n > 0 { parts.append(spellThreeDigits(String(n), mode: .normal)) }
+
+        return parts.joined(separator: " ")
     }
     
     // MARK: - Nested Types

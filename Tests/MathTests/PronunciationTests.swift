@@ -96,4 +96,9 @@ struct PronunciationTests {
         #expect(result.contains("three"))
         #expect(result.contains("and"))
     }
+    
+    @Test("Full test")
+    func testFull() async throws {
+        #expect(Math(stringLiteral: "-01234567890.123456789").spelledOut == "negative one billion two hundred thirty four million five hundred sixty seven thousand eight hundred ninety and one hundred twenty three million four hundred fifty six thousand seven hundred eighty nine billionths")
+    }
 }

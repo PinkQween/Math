@@ -28,13 +28,14 @@ public struct Math: NumberProtocol {
     public init(stringLiteral value: String) {
         if let intVal = Int(value) {
             self.storage = .int(intVal)
-        } else if let dblVal = Double(value) {
-            self.storage = .double(dblVal)
         } else if value.contains(".") {
+            // Handle decimal numbers with BigDecimal for precision
             let parts = value.split(separator: ".")
             let scale = parts.count > 1 ? parts[1].count : 0
             let combined = parts.joined()
             self.storage = .bigDecimal(BigInt(combined) ?? .zero, scale: scale)
+        } else if let dblVal = Double(value) {
+            self.storage = .double(dblVal)
         } else {
             self.storage = .bigInt(BigInt(value) ?? .zero)
         }
