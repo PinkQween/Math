@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import BigInt
+
 
 // MARK: - Core Math Type
 
@@ -82,13 +82,40 @@ public struct Math: NumberProtocol {
         switch storage {
         case .int(let v): return (BigInt(v), 0)
         case .double(let v):
-            let str = String(v)
-            if let dot = str.firstIndex(of: ".") {
-                let decimals = str.distance(from: dot, to: str.endIndex) - 1
-                let cleaned = str.replacingOccurrences(of: ".", with: "")
+            // Handle zero
+            if v == 0 { return (.zero, 0) }
+
+            // Use Decimal's internal representation for accuracy
+            var decimal = Decimal(v)
+            var rounded = Decimal()
+            NSDecimalRound(&rounded, &decimal, 15, .plain) // Round to 15 significant digits
+
+            // Extract components
+            let isNegative = rounded < 0
+            let absDecimal = abs(rounded)
+
+            // Convert to string with enough precision
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.minimumFractionDigits = 0
+            formatter.maximumFractionDigits = 15
+            formatter.usesGroupingSeparator = false
+
+            guard let str = formatter.string(from: absDecimal as NSNumber) else {
+                return (BigInt(Int(v)), 0)
+            }
+
+            var resultStr = str
+            if isNegative {
+                resultStr = "-" + resultStr
+            }
+
+            if let dot = resultStr.firstIndex(of: ".") {
+                let decimals = resultStr.distance(from: dot, to: resultStr.endIndex) - 1
+                let cleaned = resultStr.replacingOccurrences(of: ".", with: "")
                 return (BigInt(cleaned) ?? .zero, decimals)
             }
-            return (BigInt(Int(v)), 0)
+            return (BigInt(resultStr) ?? .zero, 0)
         case .bigInt(let v): return (v, 0)
         case .bigDecimal(let v, let scale): return (v, scale)
         }

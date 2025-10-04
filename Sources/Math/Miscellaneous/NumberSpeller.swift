@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import BigInt
+
 
 // MARK: - NumberSpeller
 
@@ -282,10 +282,10 @@ public struct NumberSpeller {
         case 11: return "hundred-billionth"
         case 12: return "trillionth"
         default:
-            let illionIndex = Math(integerLiteral: ((power - 3) / 3))
+            let illionIndex = (power - 3) / 3
             let remainder = (power - 3) % 3
-            
-            let base = LargeNumber.name(forIndex: illionIndex + 1) // million = 10^6
+
+            let base = LargeNumber.name(forIndex: Math(integerLiteral: illionIndex + 1)) // million = 10^6
             let prefix: String
             switch remainder {
             case 0: prefix = ""
@@ -347,23 +347,25 @@ public struct NumberSpeller {
         /// - Returns: The illion name as a string.
         public static func name(forIndex index: Math) -> String {
             guard index > 0 else { return "" }
-            if let irregular = irregulars[index.asInt ?? Int.max] { return irregular }
-            
-            let unitsPart = index % 10
-            let tensPart = (index % 100) / 10 * 10
-            let hundredsPart = (index / 100) * 100 % 1000
-            
+            guard let indexInt = index.asInt else { return "" }
+
+            if let irregular = irregulars[indexInt] { return irregular }
+
+            let unitsPart = indexInt % 10
+            let tensPart = ((indexInt % 100) / 10) * 10
+            let hundredsPart = ((indexInt / 100) % 10) * 100
+
             var parts: [String] = []
-            if hundredsPart != 0, let hundreds = hundredsMap[index.asInt ?? Int.max] {
+            if hundredsPart != 0, let hundreds = hundredsMap[hundredsPart] {
                 parts.append(hundreds)
             }
-            if tensPart != 0, let tens = tensMap[index.asInt ?? Int.max] {
+            if tensPart != 0, let tens = tensMap[tensPart] {
                 parts.append(tens)
             }
-            if unitsPart != 0, let units = unitsMap[index.asInt ?? Int.max] {
+            if unitsPart != 0, let units = unitsMap[unitsPart] {
                 parts.append(units)
             }
-            
+
             return parts.joined() + "illion"
         }
     }

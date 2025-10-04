@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import BigInt
+
 
 // MARK: - Arithmetic Operators
 
@@ -31,10 +31,18 @@ public extension Math {
     static func / (lhs: Math, rhs: Math) -> Math {
         let (lv, ls) = lhs.asBigDecimal()
         let (rv, rs) = rhs.asBigDecimal()
-        let scale = max(ls, rs) + 10 // precision buffer
-        let factor = BigInt(10).power(scale)
+
+        // Guard against division by zero
+        guard rv != 0 else {
+            fatalError("Division by zero")
+        }
+
+        // For (lv/10^ls) / (rv/10^rs), we need scale = ls - rs + precision
+        let precision = 10
+        let resultScale = ls - rs + precision
+        let factor = BigInt(10).power(precision)
         let quotient = (lv * factor) / rv
-        return .init(bigDecimal: quotient, scale: scale)
+        return .init(bigDecimal: quotient, scale: resultScale)
     }
 
     static func % (lhs: Math, rhs: Math) -> Math {

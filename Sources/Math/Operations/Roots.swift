@@ -26,16 +26,14 @@ public extension Math {
             fatalError("Cannot convert Math to Double for root calculation")
         }
 
-        var x = lhsDouble / nDouble
-        let iterations = min(Int(MathSettings.shared.precision.asDouble ?? 100), 10_000)
-        let tolerance = 1e-12
+        // Special cases
+        if nDouble == 1 { return lhs }
+        if lhsDouble == 0 { return Math(0) }
+        if nDouble == 2 { return Math(floatLiteral: sqrt(lhsDouble)) }
 
-        for _ in 0..<iterations {
-            let xPrev = x
-            x = ((nDouble - 1) * x + lhsDouble / pow(x, nDouble - 1)) / nDouble
-            if abs(x - xPrev) < tolerance { break }
-        }
-        return Math(floatLiteral: x)
+        // Use Swift's pow for direct calculation
+        let result = pow(lhsDouble, 1.0 / nDouble)
+        return Math(floatLiteral: result)
     }
 
     /// Alternative root operator syntax.

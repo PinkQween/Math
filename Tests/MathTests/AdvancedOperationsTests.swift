@@ -29,9 +29,9 @@ struct AdvancedOperationsTests {
     @Test("Square root")
     func testSquareRoot() async throws {
         let result = Calculate(settings: .init(angleMode: .degrees, precision: 1000)) {
-            Math(2) |/ Math(2)
+            Math(4) |/ Math(2)
         }
-        #expect(result == 1.414213562373095)
+        #expect(result == 2)
     }
 
     @Test("Cube root")

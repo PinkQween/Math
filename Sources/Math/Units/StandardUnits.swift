@@ -18,8 +18,8 @@ public struct StandardUnits {
     public static let meter = Unit(
         name: "meter",
         symbol: "m",
-        dimension: .length,
-        toBaseUnit: 1.0,
+        dimension: .standard(.length),
+        toBaseScale: Math(1.0),
         notes: "SI base unit"
     )
 
@@ -27,8 +27,8 @@ public struct StandardUnits {
     public static let kilometer = Unit(
         name: "kilometer",
         symbol: "km",
-        dimension: .length,
-        toBaseUnit: 1000.0,
+        dimension: .standard(.length),
+        toBaseScale: Math(1000.0),
         notes: "= 1000 m"
     )
 
@@ -36,8 +36,8 @@ public struct StandardUnits {
     public static let centimeter = Unit(
         name: "centimeter",
         symbol: "cm",
-        dimension: .length,
-        toBaseUnit: 0.01,
+        dimension: .standard(.length),
+        toBaseScale: Math(0.01),
         notes: "= 0.01 m"
     )
 
@@ -45,8 +45,8 @@ public struct StandardUnits {
     public static let millimeter = Unit(
         name: "millimeter",
         symbol: "mm",
-        dimension: .length,
-        toBaseUnit: 0.001,
+        dimension: .standard(.length),
+        toBaseScale: Math(0.001),
         notes: "= 0.001 m"
     )
 
@@ -54,8 +54,8 @@ public struct StandardUnits {
     public static let micrometer = Unit(
         name: "micrometer",
         symbol: "μm",
-        dimension: .length,
-        toBaseUnit: 1e-6,
+        dimension: .standard(.length),
+        toBaseScale: Math(1e-6),
         notes: "= 0.000001 m"
     )
 
@@ -63,8 +63,8 @@ public struct StandardUnits {
     public static let nanometer = Unit(
         name: "nanometer",
         symbol: "nm",
-        dimension: .length,
-        toBaseUnit: 1e-9,
+        dimension: .standard(.length),
+        toBaseScale: Math(1e-9),
         notes: "= 0.000000001 m"
     )
 
@@ -72,8 +72,8 @@ public struct StandardUnits {
     public static let foot = Unit(
         name: "foot",
         symbol: "ft",
-        dimension: .length,
-        toBaseUnit: 0.3048,
+        dimension: .standard(.length),
+        toBaseScale: Math(0.3048),
         notes: "= 0.3048 m"
     )
 
@@ -81,8 +81,8 @@ public struct StandardUnits {
     public static let inch = Unit(
         name: "inch",
         symbol: "in",
-        dimension: .length,
-        toBaseUnit: 0.0254,
+        dimension: .standard(.length),
+        toBaseScale: Math(0.0254),
         notes: "= 2.54 cm"
     )
 
@@ -90,8 +90,8 @@ public struct StandardUnits {
     public static let yard = Unit(
         name: "yard",
         symbol: "yd",
-        dimension: .length,
-        toBaseUnit: 0.9144,
+        dimension: .standard(.length),
+        toBaseScale: Math(0.9144),
         notes: "= 3 ft = 0.9144 m"
     )
 
@@ -99,8 +99,8 @@ public struct StandardUnits {
     public static let mile = Unit(
         name: "mile",
         symbol: "mi",
-        dimension: .length,
-        toBaseUnit: 1609.344,
+        dimension: .standard(.length),
+        toBaseScale: Math(1609.344),
         notes: "= 5280 ft = 1609.344 m"
     )
 
@@ -108,8 +108,8 @@ public struct StandardUnits {
     public static let nauticalMile = Unit(
         name: "nautical mile",
         symbol: "nmi",
-        dimension: .length,
-        toBaseUnit: 1852.0,
+        dimension: .standard(.length),
+        toBaseScale: Math(1852.0),
         notes: "= 1852 m (used in maritime/aviation)"
     )
 
@@ -119,8 +119,8 @@ public struct StandardUnits {
     public static let kilogram = Unit(
         name: "kilogram",
         symbol: "kg",
-        dimension: .mass,
-        toBaseUnit: 1.0,
+        dimension: .standard(.mass),
+        toBaseScale: Math(1.0),
         notes: "SI base unit"
     )
 
@@ -128,8 +128,8 @@ public struct StandardUnits {
     public static let gram = Unit(
         name: "gram",
         symbol: "g",
-        dimension: .mass,
-        toBaseUnit: 0.001,
+        dimension: .standard(.mass),
+        toBaseScale: Math(0.001),
         notes: "= 0.001 kg"
     )
 
@@ -137,8 +137,8 @@ public struct StandardUnits {
     public static let milligram = Unit(
         name: "milligram",
         symbol: "mg",
-        dimension: .mass,
-        toBaseUnit: 1e-6,
+        dimension: .standard(.mass),
+        toBaseScale: Math(1e-6),
         notes: "= 0.000001 kg"
     )
 
@@ -146,8 +146,8 @@ public struct StandardUnits {
     public static let metricTon = Unit(
         name: "metric ton",
         symbol: "t",
-        dimension: .mass,
-        toBaseUnit: 1000.0,
+        dimension: .standard(.mass),
+        toBaseScale: Math(1000.0),
         notes: "= 1000 kg"
     )
 
@@ -155,8 +155,8 @@ public struct StandardUnits {
     public static let pound = Unit(
         name: "pound",
         symbol: "lb",
-        dimension: .mass,
-        toBaseUnit: 0.45359237,
+        dimension: .standard(.mass),
+        toBaseScale: Math(0.45359237),
         notes: "= 0.45359237 kg"
     )
 
@@ -164,8 +164,8 @@ public struct StandardUnits {
     public static let ounce = Unit(
         name: "ounce",
         symbol: "oz",
-        dimension: .mass,
-        toBaseUnit: 0.028349523125,
+        dimension: .standard(.mass),
+        toBaseScale: Math(0.028349523125),
         notes: "= 1/16 lb ≈ 28.35 g"
     )
 
@@ -173,8 +173,8 @@ public struct StandardUnits {
     public static let stone = Unit(
         name: "stone",
         symbol: "st",
-        dimension: .mass,
-        toBaseUnit: 6.35029318,
+        dimension: .standard(.mass),
+        toBaseScale: Math(6.35029318),
         notes: "= 14 lb ≈ 6.35 kg (British)"
     )
 
@@ -184,8 +184,8 @@ public struct StandardUnits {
     public static let second = Unit(
         name: "second",
         symbol: "s",
-        dimension: .time,
-        toBaseUnit: 1.0,
+        dimension: .standard(.time),
+        toBaseScale: Math(1.0),
         notes: "SI base unit"
     )
 
@@ -193,8 +193,8 @@ public struct StandardUnits {
     public static let minute = Unit(
         name: "minute",
         symbol: "min",
-        dimension: .time,
-        toBaseUnit: 60.0,
+        dimension: .standard(.time),
+        toBaseScale: Math(60.0),
         notes: "= 60 s"
     )
 
@@ -202,8 +202,8 @@ public struct StandardUnits {
     public static let hour = Unit(
         name: "hour",
         symbol: "h",
-        dimension: .time,
-        toBaseUnit: 3600.0,
+        dimension: .standard(.time),
+        toBaseScale: Math(3600.0),
         notes: "= 60 min = 3600 s"
     )
 
@@ -211,8 +211,8 @@ public struct StandardUnits {
     public static let day = Unit(
         name: "day",
         symbol: "d",
-        dimension: .time,
-        toBaseUnit: 86400.0,
+        dimension: .standard(.time),
+        toBaseScale: Math(86400.0),
         notes: "= 24 h = 86,400 s"
     )
 
@@ -220,8 +220,8 @@ public struct StandardUnits {
     public static let week = Unit(
         name: "week",
         symbol: "wk",
-        dimension: .time,
-        toBaseUnit: 604800.0,
+        dimension: .standard(.time),
+        toBaseScale: Math(604800.0),
         notes: "= 7 d = 604,800 s"
     )
 
@@ -229,8 +229,8 @@ public struct StandardUnits {
     public static let year = Unit(
         name: "year",
         symbol: "yr",
-        dimension: .time,
-        toBaseUnit: 31557600.0,
+        dimension: .standard(.time),
+        toBaseScale: Math(31557600.0),
         notes: "= 365.25 d ≈ 31.56 million s"
     )
 
@@ -238,8 +238,8 @@ public struct StandardUnits {
     public static let millisecond = Unit(
         name: "millisecond",
         symbol: "ms",
-        dimension: .time,
-        toBaseUnit: 0.001,
+        dimension: .standard(.time),
+        toBaseScale: Math(0.001),
         notes: "= 0.001 s"
     )
 
@@ -247,8 +247,8 @@ public struct StandardUnits {
     public static let microsecond = Unit(
         name: "microsecond",
         symbol: "μs",
-        dimension: .time,
-        toBaseUnit: 1e-6,
+        dimension: .standard(.time),
+        toBaseScale: Math(1e-6),
         notes: "= 0.000001 s"
     )
 
@@ -256,8 +256,8 @@ public struct StandardUnits {
     public static let nanosecond = Unit(
         name: "nanosecond",
         symbol: "ns",
-        dimension: .time,
-        toBaseUnit: 1e-9,
+        dimension: .standard(.time),
+        toBaseScale: Math(1e-9),
         notes: "= 0.000000001 s"
     )
 
@@ -267,8 +267,8 @@ public struct StandardUnits {
     public static let squareMeter = Unit(
         name: "square meter",
         symbol: "m²",
-        dimension: .area,
-        toBaseUnit: 1.0,
+        dimension: .standard(.area),
+        toBaseScale: Math(1.0),
         notes: "SI derived unit"
     )
 
@@ -276,8 +276,8 @@ public struct StandardUnits {
     public static let squareKilometer = Unit(
         name: "square kilometer",
         symbol: "km²",
-        dimension: .area,
-        toBaseUnit: 1_000_000.0,
+        dimension: .standard(.area),
+        toBaseScale: Math(1_000_000.0),
         notes: "= 1,000,000 m²"
     )
 
@@ -285,8 +285,8 @@ public struct StandardUnits {
     public static let squareFoot = Unit(
         name: "square foot",
         symbol: "ft²",
-        dimension: .area,
-        toBaseUnit: 0.09290304,
+        dimension: .standard(.area),
+        toBaseScale: Math(0.09290304),
         notes: "≈ 0.0929 m²"
     )
 
@@ -294,8 +294,8 @@ public struct StandardUnits {
     public static let squareMile = Unit(
         name: "square mile",
         symbol: "mi²",
-        dimension: .area,
-        toBaseUnit: 2_589_988.110336,
+        dimension: .standard(.area),
+        toBaseScale: Math(2_589_988.110336),
         notes: "≈ 2.59 million m²"
     )
 
@@ -303,8 +303,8 @@ public struct StandardUnits {
     public static let acre = Unit(
         name: "acre",
         symbol: "ac",
-        dimension: .area,
-        toBaseUnit: 4046.8564224,
+        dimension: .standard(.area),
+        toBaseScale: Math(4046.8564224),
         notes: "= 43,560 ft² ≈ 4047 m²"
     )
 
@@ -312,8 +312,8 @@ public struct StandardUnits {
     public static let hectare = Unit(
         name: "hectare",
         symbol: "ha",
-        dimension: .area,
-        toBaseUnit: 10_000.0,
+        dimension: .standard(.area),
+        toBaseScale: Math(10_000.0),
         notes: "= 10,000 m² = 2.471 acres"
     )
 
@@ -323,8 +323,8 @@ public struct StandardUnits {
     public static let cubicMeter = Unit(
         name: "cubic meter",
         symbol: "m³",
-        dimension: .volume,
-        toBaseUnit: 1.0,
+        dimension: .standard(.volume),
+        toBaseScale: Math(1.0),
         notes: "SI derived unit"
     )
 
@@ -332,8 +332,8 @@ public struct StandardUnits {
     public static let liter = Unit(
         name: "liter",
         symbol: "L",
-        dimension: .volume,
-        toBaseUnit: 0.001,
+        dimension: .standard(.volume),
+        toBaseScale: Math(0.001),
         notes: "= 0.001 m³ = 1 dm³"
     )
 
@@ -341,8 +341,8 @@ public struct StandardUnits {
     public static let milliliter = Unit(
         name: "milliliter",
         symbol: "mL",
-        dimension: .volume,
-        toBaseUnit: 1e-6,
+        dimension: .standard(.volume),
+        toBaseScale: Math(1e-6),
         notes: "= 0.001 L = 1 cm³"
     )
 
@@ -350,8 +350,8 @@ public struct StandardUnits {
     public static let gallonUS = Unit(
         name: "gallon (US)",
         symbol: "gal",
-        dimension: .volume,
-        toBaseUnit: 0.003785411784,
+        dimension: .standard(.volume),
+        toBaseScale: Math(0.003785411784),
         notes: "= 3.785 L (US liquid gallon)"
     )
 
@@ -359,8 +359,8 @@ public struct StandardUnits {
     public static let gallonImperial = Unit(
         name: "gallon (UK)",
         symbol: "gal",
-        dimension: .volume,
-        toBaseUnit: 0.00454609,
+        dimension: .standard(.volume),
+        toBaseScale: Math(0.00454609),
         notes: "= 4.546 L (Imperial gallon)"
     )
 
@@ -368,8 +368,8 @@ public struct StandardUnits {
     public static let quartUS = Unit(
         name: "quart (US)",
         symbol: "qt",
-        dimension: .volume,
-        toBaseUnit: 0.000946352946,
+        dimension: .standard(.volume),
+        toBaseScale: Math(0.000946352946),
         notes: "= 1/4 US gal ≈ 0.946 L"
     )
 
@@ -377,8 +377,8 @@ public struct StandardUnits {
     public static let pintUS = Unit(
         name: "pint (US)",
         symbol: "pt",
-        dimension: .volume,
-        toBaseUnit: 0.000473176473,
+        dimension: .standard(.volume),
+        toBaseScale: Math(0.000473176473),
         notes: "= 1/8 US gal ≈ 473 mL"
     )
 
@@ -386,8 +386,8 @@ public struct StandardUnits {
     public static let cupUS = Unit(
         name: "cup (US)",
         symbol: "cup",
-        dimension: .volume,
-        toBaseUnit: 0.0002365882365,
+        dimension: .standard(.volume),
+        toBaseScale: Math(0.0002365882365),
         notes: "= 8 fl oz ≈ 237 mL"
     )
 
@@ -395,8 +395,8 @@ public struct StandardUnits {
     public static let fluidOunceUS = Unit(
         name: "fluid ounce (US)",
         symbol: "fl oz",
-        dimension: .volume,
-        toBaseUnit: 2.95735295625e-5,
+        dimension: .standard(.volume),
+        toBaseScale: Math(2.95735295625e-5),
         notes: "≈ 29.57 mL"
     )
 
@@ -404,8 +404,8 @@ public struct StandardUnits {
     public static let tablespoon = Unit(
         name: "tablespoon",
         symbol: "tbsp",
-        dimension: .volume,
-        toBaseUnit: 1.478676478125e-5,
+        dimension: .standard(.volume),
+        toBaseScale: Math(1.478676478125e-5),
         notes: "= 1/2 fl oz ≈ 14.79 mL"
     )
 
@@ -413,8 +413,8 @@ public struct StandardUnits {
     public static let teaspoon = Unit(
         name: "teaspoon",
         symbol: "tsp",
-        dimension: .volume,
-        toBaseUnit: 4.92892159375e-6,
+        dimension: .standard(.volume),
+        toBaseScale: Math(4.92892159375e-6),
         notes: "= 1/3 tbsp ≈ 4.93 mL"
     )
 }
