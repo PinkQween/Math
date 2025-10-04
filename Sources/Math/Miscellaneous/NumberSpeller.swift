@@ -55,6 +55,12 @@ public struct NumberSpeller {
         }
         
         let groups = Self.splitIntoThreeDigitGroups(integerPart)
+        
+        // ✅ handle zero explicitly
+        if groups.allSatisfy({ Int($0) == 0 }) && fractionPart.isEmpty {
+            return negative ? "negative zero" : "zero"
+        }
+        
         let spelledInteger = Self.spellIntegerGroups(groups, mode: mode)
         
         var result = spelledInteger
@@ -104,7 +110,14 @@ public struct NumberSpeller {
         }
         
         let groups = Self.splitIntoThreeDigitGroups(integerPart)
+        
+        // ✅ handle zero explicitly
+        if groups.allSatisfy({ Int($0) == 0 }) && fractionPart.isEmpty {
+            return negative ? "negative zero" : "zero"
+        }
+        
         let spelledInteger = Self.spellIntegerGroups(groups, mode: mode)
+        
         
         var result = spelledInteger
         
@@ -146,7 +159,8 @@ public struct NumberSpeller {
         for (index, groupStr) in groups.enumerated() {
             guard let groupNum = Int(groupStr), groupNum > 0 else { continue }
             let groupName = spellThreeDigits(groupNum, mode: mode)
-            let positionFromRight = groups.count - (mode == .aviation ? 1 : 2) - index
+            //            let positionFromRight = groups.count - (mode == .aviation ? 1 : 2) - index
+            let positionFromRight = groups.count - index - 1
             
             let suffix: String
             switch mode {
@@ -164,14 +178,14 @@ public struct NumberSpeller {
                 case 0: suffix = ""
                 case 1: suffix = " thousand"
                 default:
-                    suffix = " " + LargeNumber.name(forIndex: Math(integerLiteral: positionFromRight))
-                }
-            }
+                    // subtract 1 because "million" is the *first* illion
+                    suffix = " " + LargeNumber.name(forIndex: Math(integerLiteral: positionFromRight - 1))
+                }            }
             
             spelledParts.append(groupName + suffix)
         }
         
-        return spelledParts.joined(separator: " ")
+        return spelledParts.joined(separator: " ").trimmingCharacters(in: .whitespaces)
     }
     
     /// Spells out a three-digit number according to the pronunciation mode.

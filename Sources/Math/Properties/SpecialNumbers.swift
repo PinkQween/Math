@@ -113,15 +113,22 @@ public extension Math {
     /// Fibonacci sequence: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144...
     /// A number is Fibonacci if one of (5n²+4) or (5n²-4) is a perfect square.
     var isFibonacci: Bool {
-        guard let n = self.asInt, n >= 0 else { return false }
-
-        let test1 = 5 * n * n + 4
-        let test2 = 5 * n * n - 4
-
-        let sqrt1 = Int(Double(test1).squareRoot())
-        let sqrt2 = Int(Double(test2).squareRoot())
-
-        return (sqrt1 * sqrt1 == test1) || (sqrt2 * sqrt2 == test2)
+        let n = self
+        
+        guard n >= 0, n.isInt else { return false }
+        
+        if n == 0 || n == 1 { return true }
+        
+        var a: Math = 0
+        var b: Math = 1
+        
+        while b < n {
+            let next = a + b
+            a = b
+            b = next
+        }
+        
+        return b == n
     }
 
     /// Returns `true` if this number is a palindrome.

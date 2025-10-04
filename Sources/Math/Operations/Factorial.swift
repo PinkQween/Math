@@ -21,9 +21,15 @@ public extension Math {
     /// - Returns: `n! = 1 × 2 × ... × n`
     /// - Note: Returns `1` if the value is not a non-negative integer.
     static postfix func ~! (x: Math) -> Math {
-        guard let n = x.asInt, n >= 0 else { return 1 }
+        guard let n = x.asInt else {
+            fatalError("Cannot calculate factorial of non-integer")
+        }
+        
+        guard n >= 0 else { return 1 }
+        if n == 0 || n == 1 { return 1 }
+        
         var result = BigInt(1)
-        for i in 1...n {
+        for i in 2...n {
             result *= BigInt(i)
         }
         return Math(bigDecimal: result, scale: 0)
