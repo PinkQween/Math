@@ -365,6 +365,14 @@ struct ClassifacationTests {
             }
         }
     }
+    
+    @Test func getSign() async throws {
+        let testCases: [Math: Sign] = [-1 : .negitive, 0 : .zero, 1 : .positive]
+        
+        for n in testCases {
+            #expect(n.key.getSign() == n.value)
+        }
+    }
 }
 
 

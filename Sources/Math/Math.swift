@@ -142,6 +142,8 @@ public struct Math: NumberProtocol {
     public typealias Stride = Int
     
     // MARK: - Conversion Helpers
+
+    /// Converts this value to a `Double`, if possible.
     public var asDouble: Double? {
         switch storage {
         case .int(let v): return Double(v)
@@ -152,7 +154,8 @@ public struct Math: NumberProtocol {
             return base / pow(10.0, Double(scale))
         }
     }
-    
+
+    /// Converts this value to an `Int`, if possible.
     public var asInt: Int? {
         switch storage {
         case .int(let v): return v
@@ -303,8 +306,24 @@ public struct Math: NumberProtocol {
         return true
     }
     
-    public func getParity() -> Parity {
+    /// Returns the parity of this value.
+    ///
+    /// - Returns: `.even` if the value is divisible by 2, otherwise `.odd`.
+    public var parity: Parity {
         return self % 2 == 0 ? .even : .odd
+    }
+
+    /// Returns the sign of this value.
+    ///
+    /// - Returns: `.positive` if greater than zero, `.negative` if less than zero, or `.zero` if equal to zero.
+    public var sign: Sign {
+        if self < 0 {
+            return .negative
+        } else if self == 0 {
+            return .zero
+        } else {
+            return .positive
+        }
     }
 }
 
