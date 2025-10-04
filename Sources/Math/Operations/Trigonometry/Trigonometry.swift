@@ -524,24 +524,34 @@ public struct Triangle {
 
         if alpha == nil {
             // cos(alpha) = (b² + c² - a²) / (2bc)
-            let cosAlpha = (sideB * sideB + sideC * sideC - sideA * sideA) / (2 * sideB * sideC)
-            alpha = Calculate(settings: .init(angleMode: MathSettings.shared.angleMode, precision: MathSettings.shared.precision)) {
-                Math.acos(cosAlpha)
-            }
+            var cosAlphaVal = Double((sideB * sideB + sideC * sideC - sideA * sideA) / (2 * sideB * sideC))
+            // Clamp to [-1, 1] to handle floating point errors
+            cosAlphaVal = min(max(cosAlphaVal, -1.0), 1.0)
+
+            let angleRad = Foundation.acos(cosAlphaVal)
+            alpha = MathSettings.shared.angleMode == .degrees
+                ? Math(floatLiteral: angleRad * 180.0 / Double.pi)
+                : Math(floatLiteral: angleRad)
         }
 
         if beta == nil {
-            let cosBeta = (sideA * sideA + sideC * sideC - sideB * sideB) / (2 * sideA * sideC)
-            beta = Calculate(settings: .init(angleMode: MathSettings.shared.angleMode, precision: MathSettings.shared.precision)) {
-                Math.acos(cosBeta)
-            }
+            var cosBetaVal = Double((sideA * sideA + sideC * sideC - sideB * sideB) / (2 * sideA * sideC))
+            cosBetaVal = min(max(cosBetaVal, -1.0), 1.0)
+
+            let angleRad = Foundation.acos(cosBetaVal)
+            beta = MathSettings.shared.angleMode == .degrees
+                ? Math(floatLiteral: angleRad * 180.0 / Double.pi)
+                : Math(floatLiteral: angleRad)
         }
 
         if gamma == nil {
-            let cosGamma = (sideA * sideA + sideB * sideB - sideC * sideC) / (2 * sideA * sideB)
-            gamma = Calculate(settings: .init(angleMode: MathSettings.shared.angleMode, precision: MathSettings.shared.precision)) {
-                Math.acos(cosGamma)
-            }
+            var cosGammaVal = Double((sideA * sideA + sideB * sideB - sideC * sideC) / (2 * sideA * sideB))
+            cosGammaVal = min(max(cosGammaVal, -1.0), 1.0)
+
+            let angleRad = Foundation.acos(cosGammaVal)
+            gamma = MathSettings.shared.angleMode == .degrees
+                ? Math(floatLiteral: angleRad * 180.0 / Double.pi)
+                : Math(floatLiteral: angleRad)
         }
     }
 
@@ -551,28 +561,31 @@ public struct Triangle {
         // Case: a, b, gamma known
         if let sideA = a, let sideB = b, let angleGamma = gamma, c == nil {
             // c² = a² + b² - 2ab·cos(gamma)
-            let cosGamma = Calculate(settings: .init(angleMode: .radians, precision: MathSettings.shared.precision)) {
-                Math.cos(angleGamma)
-            }
-            let cSquared = sideA * sideA + sideB * sideB - 2 * sideA * sideB * cosGamma
+            let angleRad = MathSettings.shared.angleMode == .degrees
+                ? Double(angleGamma) * Double.pi / 180.0
+                : Double(angleGamma)
+            let cosGamma = Foundation.cos(angleRad)
+            let cSquared = sideA * sideA + sideB * sideB - 2 * sideA * sideB * Math(floatLiteral: cosGamma)
             c = Math.sqrt(cSquared)
         }
 
         // Case: a, c, beta known
         if let sideA = a, let sideC = c, let angleBeta = beta, b == nil {
-            let cosBeta = Calculate(settings: .init(angleMode: .radians, precision: MathSettings.shared.precision)) {
-                Math.cos(angleBeta)
-            }
-            let bSquared = sideA * sideA + sideC * sideC - 2 * sideA * sideC * cosBeta
+            let angleRad = MathSettings.shared.angleMode == .degrees
+                ? Double(angleBeta) * Double.pi / 180.0
+                : Double(angleBeta)
+            let cosBeta = Foundation.cos(angleRad)
+            let bSquared = sideA * sideA + sideC * sideC - 2 * sideA * sideC * Math(floatLiteral: cosBeta)
             b = Math.sqrt(bSquared)
         }
 
         // Case: b, c, alpha known
         if let sideB = b, let sideC = c, let angleAlpha = alpha, a == nil {
-            let cosAlpha = Calculate(settings: .init(angleMode: .radians, precision: MathSettings.shared.precision)) {
-                Math.cos(angleAlpha)
-            }
-            let aSquared = sideB * sideB + sideC * sideC - 2 * sideB * sideC * cosAlpha
+            let angleRad = MathSettings.shared.angleMode == .degrees
+                ? Double(angleAlpha) * Double.pi / 180.0
+                : Double(angleAlpha)
+            let cosAlpha = Foundation.cos(angleRad)
+            let aSquared = sideB * sideB + sideC * sideC - 2 * sideB * sideC * Math(floatLiteral: cosAlpha)
             a = Math.sqrt(aSquared)
         }
     }
@@ -585,37 +598,43 @@ public struct Triangle {
 
         guard let angleAlpha = alpha, let angleBeta = beta, let angleGamma = gamma else { return }
 
-        let sinAlpha = Calculate(settings: .init(angleMode: .radians, precision: MathSettings.shared.precision)) {
-            Math.sin(angleAlpha)
-        }
-        let sinBeta = Calculate(settings: .init(angleMode: .radians, precision: MathSettings.shared.precision)) {
-            Math.sin(angleBeta)
-        }
-        let sinGamma = Calculate(settings: .init(angleMode: .radians, precision: MathSettings.shared.precision)) {
-            Math.sin(angleGamma)
-        }
+        // Convert angles to radians and calculate sines
+        let alphaRad = MathSettings.shared.angleMode == .degrees
+            ? Double(angleAlpha) * Double.pi / 180.0
+            : Double(angleAlpha)
+        let betaRad = MathSettings.shared.angleMode == .degrees
+            ? Double(angleBeta) * Double.pi / 180.0
+            : Double(angleBeta)
+        let gammaRad = MathSettings.shared.angleMode == .degrees
+            ? Double(angleGamma) * Double.pi / 180.0
+            : Double(angleGamma)
+
+        let sinAlpha = Foundation.sin(alphaRad)
+        let sinBeta = Foundation.sin(betaRad)
+        let sinGamma = Foundation.sin(gammaRad)
 
         // Use Law of Sines to find missing sides
+        // Guard against division by zero when sine is 0 (angle is 0° or 180°)
         if let sideA = a {
-            if b == nil {
-                b = sideA * sinBeta / sinAlpha
+            if b == nil && abs(sinAlpha) > 0.0001 {
+                b = sideA * Math(floatLiteral: sinBeta / sinAlpha)
             }
-            if c == nil {
-                c = sideA * sinGamma / sinAlpha
+            if c == nil && abs(sinAlpha) > 0.0001 {
+                c = sideA * Math(floatLiteral: sinGamma / sinAlpha)
             }
         } else if let sideB = b {
-            if a == nil {
-                a = sideB * sinAlpha / sinBeta
+            if a == nil && abs(sinBeta) > 0.0001 {
+                a = sideB * Math(floatLiteral: sinAlpha / sinBeta)
             }
-            if c == nil {
-                c = sideB * sinGamma / sinBeta
+            if c == nil && abs(sinBeta) > 0.0001 {
+                c = sideB * Math(floatLiteral: sinGamma / sinBeta)
             }
         } else if let sideC = c {
-            if a == nil {
-                a = sideC * sinAlpha / sinGamma
+            if a == nil && abs(sinGamma) > 0.0001 {
+                a = sideC * Math(floatLiteral: sinAlpha / sinGamma)
             }
-            if b == nil {
-                b = sideC * sinBeta / sinGamma
+            if b == nil && abs(sinGamma) > 0.0001 {
+                b = sideC * Math(floatLiteral: sinBeta / sinGamma)
             }
         }
     }
@@ -625,51 +644,57 @@ public struct Triangle {
     private mutating func solveSSA() {
         // Case: a, b, alpha known
         if let sideA = a, let sideB = b, let angleAlpha = alpha, beta == nil {
-            let sinAlpha = Calculate(settings: .init(angleMode: .radians, precision: MathSettings.shared.precision)) {
-                Math.sin(angleAlpha)
-            }
-            let sinBeta = sideB * sinAlpha / sideA
+            let alphaRad = MathSettings.shared.angleMode == .degrees
+                ? Double(angleAlpha) * Double.pi / 180.0
+                : Double(angleAlpha)
+            let sinAlpha = Foundation.sin(alphaRad)
+            let sinBetaVal = Double(sideB) * sinAlpha / Double(sideA)
 
             // Check if solution exists
-            guard sinBeta <= 1 && sinBeta >= -1 else {
+            guard sinBetaVal <= 1.0 && sinBetaVal >= -1.0 else {
                 fatalError("No valid triangle (SSA case): sin(beta) out of range")
             }
 
-            beta = Calculate(settings: .init(angleMode: MathSettings.shared.angleMode, precision: MathSettings.shared.precision)) {
-                Math.asin(sinBeta)
-            }
+            let betaRad = Foundation.asin(sinBetaVal)
+            beta = MathSettings.shared.angleMode == .degrees
+                ? Math(floatLiteral: betaRad * 180.0 / Double.pi)
+                : Math(floatLiteral: betaRad)
         }
 
         // Case: a, c, alpha known
         if let sideA = a, let sideC = c, let angleAlpha = alpha, gamma == nil {
-            let sinAlpha = Calculate(settings: .init(angleMode: .radians, precision: MathSettings.shared.precision)) {
-                Math.sin(angleAlpha)
-            }
-            let sinGamma = sideC * sinAlpha / sideA
+            let alphaRad = MathSettings.shared.angleMode == .degrees
+                ? Double(angleAlpha) * Double.pi / 180.0
+                : Double(angleAlpha)
+            let sinAlpha = Foundation.sin(alphaRad)
+            let sinGammaVal = Double(sideC) * sinAlpha / Double(sideA)
 
-            guard sinGamma <= 1 && sinGamma >= -1 else {
+            guard sinGammaVal <= 1.0 && sinGammaVal >= -1.0 else {
                 fatalError("No valid triangle (SSA case): sin(gamma) out of range")
             }
 
-            gamma = Calculate(settings: .init(angleMode: MathSettings.shared.angleMode, precision: MathSettings.shared.precision)) {
-                Math.asin(sinGamma)
-            }
+            let gammaRad = Foundation.asin(sinGammaVal)
+            gamma = MathSettings.shared.angleMode == .degrees
+                ? Math(floatLiteral: gammaRad * 180.0 / Double.pi)
+                : Math(floatLiteral: gammaRad)
         }
 
         // Case: b, c, beta known
         if let sideB = b, let sideC = c, let angleBeta = beta, gamma == nil {
-            let sinBeta = Calculate(settings: .init(angleMode: .radians, precision: MathSettings.shared.precision)) {
-                Math.sin(angleBeta)
-            }
-            let sinGamma = sideC * sinBeta / sideB
+            let betaRad = MathSettings.shared.angleMode == .degrees
+                ? Double(angleBeta) * Double.pi / 180.0
+                : Double(angleBeta)
+            let sinBeta = Foundation.sin(betaRad)
+            let sinGammaVal = Double(sideC) * sinBeta / Double(sideB)
 
-            guard sinGamma <= 1 && sinGamma >= -1 else {
+            guard sinGammaVal <= 1.0 && sinGammaVal >= -1.0 else {
                 fatalError("No valid triangle (SSA case): sin(gamma) out of range")
             }
 
-            gamma = Calculate(settings: .init(angleMode: MathSettings.shared.angleMode, precision: MathSettings.shared.precision)) {
-                Math.asin(sinGamma)
-            }
+            let gammaRad = Foundation.asin(sinGammaVal)
+            gamma = MathSettings.shared.angleMode == .degrees
+                ? Math(floatLiteral: gammaRad * 180.0 / Double.pi)
+                : Math(floatLiteral: gammaRad)
         }
     }
 }
