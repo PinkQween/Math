@@ -6,8 +6,7 @@ echo "🔨 Building DocC documentation..."
 # Build the package to ensure symbols exist
 swift build --target Math
 
-# Generate DocC documentation into a GitHub Pages–friendly folder
-# The folder will be ./docs/documentation/math
+# Generate DocC documentation directly under docs/documentation/math
 xcrun docc convert Sources/Math \
     --output-path ./docs/documentation/math \
     --transform-for-static-hosting \
@@ -18,20 +17,12 @@ echo "✅ Documentation built successfully"
 # Disable Jekyll for GitHub Pages
 touch ./docs/.nojekyll
 
-# Create a top-level index.html redirect to the documentation
-cat > ./docs/index.html << 'EOF'
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Redirecting to Math Documentation</title>
-<meta http-equiv="refresh" content="0; url=documentation/math/">
-<link rel="canonical" href="documentation/math/">
-</head>
-<body>
-<p>Redirecting to <a href="documentation/math/">Math Documentation</a>...</p>
-</body>
-</html>
+# Optional: Create a README or index.html at root if needed for GitHub Pages,
+# but do NOT redirect via meta refresh (breaks JS/CSS paths)
+cat > ./docs/README.md << 'EOF'
+# Math Documentation
+
+The Math documentation is available [here](documentation/math/).
 EOF
 
 echo "✅ Documentation prepared for deployment"
