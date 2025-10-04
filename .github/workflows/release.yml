@@ -1,0 +1,112 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Swift
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: '6.1'
+
+      - name: Run tests
+        run: swift test
+
+      - name: Build
+        run: swift build -c release
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          # Extract changelog section for this version
+          sed -n "/## \[$VERSION\]/,/## \[/p" CHANGELOG.md | sed '$d' > release_notes.md
+          # If empty, use a default message
+          if [ ! -s release_notes.md ]; then
+            echo "Release $VERSION" > release_notes.md
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: release_notes.md
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test-installation:
+    name: Test Installation
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - name: Setup Swift
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: '6.1'
+
+      - name: Create test package
+        run: |
+          mkdir test-install
+          cd test-install
+          swift package init --type executable
+
+      - name: Add Math dependency
+        run: |
+          cd test-install
+          cat > Package.swift << 'EOF'
+          // swift-tools-version: 6.1
+          import PackageDescription
+
+          let package = Package(
+              name: "test-install",
+              dependencies: [
+                  .package(url: "https://github.com/PinkQween/Math.git", from: "${{ needs.create-release.outputs.version }}")
+              ],
+              targets: [
+                  .executableTarget(name: "test-install", dependencies: ["Math"])
+              ]
+          )
+          EOF
+
+      - name: Update and build
+        run: |
+          cd test-install
+          swift package update
+          swift build
+
+      - name: Test basic functionality
+        run: |
+          cd test-install
+          cat > Sources/main.swift << 'EOF'
+          import Math
+
+          let a: Math = 42
+          let b: Math = 17
+          print("42 + 17 = \(a + b)")
+          print("42 is prime: \(a.isPrime)")
+          print("17 is prime: \(b.isPrime)")
+          EOF
+          swift run

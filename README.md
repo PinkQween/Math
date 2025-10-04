@@ -5,6 +5,8 @@
 [![Swift](https://img.shields.io/badge/Swift-6.1-orange.svg)](https://swift.org)
 [![Platform](https://img.shields.io/badge/platform-Darwin%20%7C%20Linux-lightgrey.svg)](https://github.com/PinkQween/Math)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/PinkQween/Math?include_prereleases)](https://github.com/PinkQween/Math/releases)
+[![Tests](https://github.com/PinkQween/Math/actions/workflows/swift.yml/badge.svg)](https://github.com/PinkQween/Math/actions/workflows/swift.yml)
 
 ## ✨ Features
 
@@ -49,14 +51,16 @@ Add Math to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/PinkQween/Math.git", from: "1.0.0")
+    .package(url: "https://github.com/PinkQween/Math.git", from: "0.1.0")
 ]
 ```
 
 Or in Xcode:
 1. File → Add Package Dependencies
 2. Enter: `https://github.com/PinkQween/Math.git`
-3. Select version and add to your target
+3. Select version `0.1.0` or later and add to your target
+
+> **Note**: This is an alpha release (0.1.0). The API may change in future versions. For production use, wait for version 1.0.0.
 
 ## 🚀 Quick Start
 
