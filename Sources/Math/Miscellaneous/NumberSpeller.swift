@@ -73,6 +73,55 @@ public struct NumberSpeller {
         return result
     }
     
+    /// Returns the spelled-out name of a numeric string.
+    ///
+    /// - Parameters:
+    ///   - math: The numeric string to spell out.
+    ///   - mode: The pronunciation mode. Defaults to `.normal`.
+    /// - Returns: The spelled-out number as a string.
+    public static func spellNumber(from n: Math, mode: PronunciationMode = .normal) -> String {
+        let string = n.description
+        
+        let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return "zero" }
+        
+        var negative = false
+        var chars = trimmed
+        if chars.first == "-" {
+            negative = true
+            chars.removeFirst()
+        }
+        
+        let integerPart: String
+        let fractionPart: String
+        
+        if let dotIndex = chars.firstIndex(of: ".") {
+            integerPart = String(chars[..<dotIndex])
+            fractionPart = String(chars[chars.index(after: dotIndex)...])
+        } else {
+            integerPart = chars
+            fractionPart = ""
+        }
+        
+        let groups = Self.splitIntoThreeDigitGroups(integerPart)
+        let spelledInteger = Self.spellIntegerGroups(groups, mode: mode)
+        
+        var result = spelledInteger
+        
+        if !fractionPart.isEmpty {
+            let fractionDecimal = Decimal(string: "0." + fractionPart) ?? 0
+            let conjunction = mode == .aviation ? "point" : "and"
+            let fractionSpelling = Self.pronounceFraction(fractionDecimal, mode: mode)
+            result += " \(conjunction) \(fractionSpelling)"
+        }
+        
+        if negative {
+            result = "negative " + result
+        }
+        
+        return result
+    }
+    
     // MARK: - Private Helpers
     
     /// Splits a numeric string into groups of three digits from right to left.

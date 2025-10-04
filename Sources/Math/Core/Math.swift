@@ -153,66 +153,6 @@ public struct Math: NumberProtocol {
         }
     }
 
-    // MARK: - Properties
-
-    /// Determines whether the current value is a prime number.
-    ///
-    /// A *prime number* is a positive integer greater than `1` whose only divisors
-    /// are `1` and itself. Equivalently, `n` is prime if there does **not** exist
-    /// any integer `d` with `2 ≤ d ≤ √n` such that `n % d == 0`.
-    ///
-    /// - Returns: `true` if the number is prime; otherwise, `false`.
-    ///
-    /// - Complexity:
-    ///   Runs in **O(√n)** time, since divisibility is only checked up to the
-    ///   square root of the value.
-    ///
-    /// - Important:
-    ///   Values less than `2` are **not prime** by definition.
-    ///
-    /// # Examples
-    ///
-    /// ```swift
-    /// Math(2).isPrime()   // true
-    /// Math(17).isPrime()  // true
-    /// Math(18).isPrime()  // false
-    /// Math(-7).isPrime()  // false
-    /// Math(0).isPrime()   // false
-    /// ```
-    public func isPrime() -> Bool {
-        guard let n = self.asInt else { return false }
-        if n < 2 { return false }
-        if n == 2 { return true }
-        if n % 2 == 0 { return false }
-
-        let limit = Int(Double(n).squareRoot())
-        if limit < 3 { return true }
-
-        for i in stride(from: 3, through: limit, by: 2) {
-            if n % i == 0 { return false }
-        }
-        return true
-    }
-
-    /// Returns the parity of this value.
-    ///
-    /// - Returns: `.even` if the value is divisible by 2, otherwise `.odd`.
-    public var parity: Parity {
-        return self % 2 == 0 ? .even : .odd
-    }
-
-    /// Returns the sign of this value.
-    ///
-    /// - Returns: `.positive` if greater than zero, `.negative` if less than zero, or `.zero` if equal to zero.
-    public var sign: Sign {
-        if self < 0 {
-            return .negative
-        } else if self == 0 {
-            return .zero
-        } else {
-            return .positive
-        }
-    }
 }
 
 // MARK: - String Convertible
