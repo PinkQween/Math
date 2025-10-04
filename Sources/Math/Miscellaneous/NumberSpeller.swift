@@ -190,57 +190,54 @@ public struct NumberSpeller {
     }
 
     private static func spellThreeDigits(_ number: Math, mode: PronunciationMode) -> String {
-        guard number > 0 else { return "" }
-        var n = number
-        var parts: [String] = []
-
         let aviationMap: [Int: String] = [
             0: "zero", 1: "one", 2: "two", 3: "tree", 4: "four",
             5: "fife", 6: "six", 7: "seven", 8: "eight", 9: "niner"
         ]
+        
+        let numStr = number.description
+        guard numStr != "0" else { return "" }
+
+        var parts: [String] = []
 
         switch mode {
         case .normal:
-            if n >= 100 {
-                let hundreds = n / 100
-                if let hundredsInt = hundreds.asInt, let hundredsStr = SmallNumbers.names[hundredsInt] {
-                    parts.append("\(hundredsStr) hundred")
-                }
-                n %= 100
+            // Pad to 3 digits
+            let padded = String(repeating: "0", count: 3 - numStr.count) + numStr
+            let digits = Array(padded)
+
+            // Hundreds
+            if digits[0] != "0", let hundreds = SmallNumbers.names[Int(String(digits[0]))!] {
+                parts.append("\(hundreds) hundred")
             }
 
-            if n >= 20 {
-                if let tensInt = (n / 10 * 10).asInt, let tensStr = TensNumbers.names[tensInt] {
+            // Tens and units
+            let tensDigit = Int(String(digits[1]))!
+            let unitsDigit = Int(String(digits[2]))!
+
+            if tensDigit == 1 { // 10-19
+                if let teen = SmallNumbers.names[10 + unitsDigit] {
+                    parts.append(teen)
+                }
+            } else {
+                if tensDigit > 1, let tensStr = TensNumbers.names[tensDigit * 10] {
                     parts.append(tensStr)
                 }
-                n %= 10
-            }
-
-            if n > 0, let unitsInt = n.asInt, let unitsStr = SmallNumbers.names[unitsInt] {
-                parts.append(unitsStr)
+                if unitsDigit > 0, let unitsStr = SmallNumbers.names[unitsDigit] {
+                    parts.append(unitsStr)
+                }
             }
 
         case .aviation:
-            if n >= 100 {
-                if let hundredsInt = (n / 100).asInt {
-                    let hundredsStr = aviationMap[hundredsInt] ?? "\(hundredsInt)"
-                    parts.append("\(hundredsStr) hundred")
-                }
-                n %= 100
-            }
-
-            if n > 0 {
-                for digitChar in n.description {
-                    if let digit = Int(String(digitChar)) {
-                        parts.append(aviationMap[digit] ?? "\(digit)")
-                    }
+            for digitChar in numStr {
+                if let digit = Int(String(digitChar)) {
+                    parts.append(aviationMap[digit] ?? String(digit))
                 }
             }
         }
 
         return parts.joined(separator: " ")
     }
-
     
     /// Pronounces the fractional part of a decimal number.
     private static func pronounceFraction(_ fraction: Decimal, mode: PronunciationMode) -> String {
