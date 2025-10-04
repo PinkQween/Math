@@ -108,14 +108,14 @@ public struct NumberSpeller {
                 case 2: suffix = " million"
                 case 3: suffix = " billion"
                 default:
-                    suffix = " " + LargeNumber.name(forIndex: positionFromRight)
+                    suffix = " " + LargeNumber.name(forIndex: Math(integerLiteral: positionFromRight))
                 }
             case .normal:
                 switch positionFromRight {
                 case 0: suffix = ""
                 case 1: suffix = " thousand"
                 default:
-                    suffix = " " + LargeNumber.name(forIndex: positionFromRight)
+                    suffix = " " + LargeNumber.name(forIndex: Math(integerLiteral: positionFromRight))
                 }
             }
             
@@ -219,7 +219,7 @@ public struct NumberSpeller {
         case 11: return "hundred-billionth"
         case 12: return "trillionth"
         default:
-            let illionIndex = (power - 3) / 3
+            let illionIndex = Math(integerLiteral: ((power - 3) / 3))
             let remainder = (power - 3) % 3
             
             let base = LargeNumber.name(forIndex: illionIndex + 1) // million = 10^6
@@ -282,22 +282,22 @@ public struct NumberSpeller {
         ///
         /// - Parameter index: The illion index (1 = million, 2 = billion, etc.)
         /// - Returns: The illion name as a string.
-        public static func name(forIndex index: Int) -> String {
+        public static func name(forIndex index: Math) -> String {
             guard index > 0 else { return "" }
-            if let irregular = irregulars[index] { return irregular }
+            if let irregular = irregulars[index.asInt ?? Int.max] { return irregular }
             
             let unitsPart = index % 10
             let tensPart = (index % 100) / 10 * 10
             let hundredsPart = (index / 100) * 100 % 1000
             
             var parts: [String] = []
-            if hundredsPart != 0, let hundreds = hundredsMap[hundredsPart] {
+            if hundredsPart != 0, let hundreds = hundredsMap[index.asInt ?? Int.max] {
                 parts.append(hundreds)
             }
-            if tensPart != 0, let tens = tensMap[tensPart] {
+            if tensPart != 0, let tens = tensMap[index.asInt ?? Int.max] {
                 parts.append(tens)
             }
-            if unitsPart != 0, let units = unitsMap[unitsPart] {
+            if unitsPart != 0, let units = unitsMap[index.asInt ?? Int.max] {
                 parts.append(units)
             }
             
