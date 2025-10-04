@@ -3,21 +3,22 @@ set -e
 
 echo "🔨 Building DocC documentation..."
 
-# Build the package (optional, ensures symbols exist)
+# Build the package to ensure symbols exist
 swift build --target Math
 
-# Generate DocC documentation
+# Generate DocC documentation into a GitHub Pages–friendly folder
+# The folder will be ./docs/documentation/math
 xcrun docc convert Sources/Math \
-    --output-path ./docs \
+    --output-path ./docs/documentation/math \
     --transform-for-static-hosting \
-    --hosting-base-path Math
+    --hosting-base-path documentation/math
 
 echo "✅ Documentation built successfully"
 
 # Disable Jekyll for GitHub Pages
 touch ./docs/.nojekyll
 
-# Create index.html redirect
+# Create a top-level index.html redirect to the documentation
 cat > ./docs/index.html << 'EOF'
 <!DOCTYPE html>
 <html>
