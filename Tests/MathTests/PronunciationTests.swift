@@ -97,6 +97,18 @@ struct PronunciationTests {
         #expect(result.contains("and"))
     }
     
+    @Test("Test very large number")
+    func testVeryLargeNumber() async throws {
+        // Test a very large number that forces BigDecimal storage (preventing crash)
+        let largeNumber = Math(stringLiteral: "999888777666555444333222111000.0")
+        let spelled = largeNumber.spelledOut
+        
+        // Verify it contains expected parts and doesn't crash
+        #expect(spelled.contains("nine hundred ninety nine"))
+        #expect(spelled.contains("trillion"))
+        #expect(!spelled.isEmpty)
+    }
+    
     @Test("Full test")
     func testFull() async throws {
         #expect(Math(stringLiteral: "-01234567890.123456789").spelledOut == "negative one billion two hundred thirty four million five hundred sixty seven thousand eight hundred ninety and one hundred twenty three million four hundred fifty six thousand seven hundred eighty nine billionths")

@@ -200,20 +200,26 @@ public struct NumberSpeller {
             let unitsDigit = padded[padded.index(padded.startIndex, offsetBy: 2)]
             
             // Hundreds
-            if hundredsDigit != "0", let hundredsName = SmallNumbers.names[Int(String(hundredsDigit))!] {
+            if hundredsDigit != "0",
+               let hundredsInt = Int(String(hundredsDigit)),
+               let hundredsName = SmallNumbers.names[hundredsInt] {
                 parts.append("\(hundredsName) hundred")
             }
             
             // Tens + Units
             if tensDigit == "1" { // 10-19
-                if let teenName = SmallNumbers.names[Int(String(tensDigit) + String(unitsDigit))!] {
+                let teenString = String(tensDigit) + String(unitsDigit)
+                if let teenInt = Int(teenString),
+                   let teenName = SmallNumbers.names[teenInt] {
                     parts.append(teenName)
                 }
             } else {
                 if tensDigit != "0", let tensName = TensNumbers.names[(Int(String(tensDigit)) ?? 0) * 10] {
                     parts.append(tensName)
                 }
-                if unitsDigit != "0", let unitsName = SmallNumbers.names[Int(String(unitsDigit))!] {
+                if unitsDigit != "0",
+                   let unitsInt = Int(String(unitsDigit)),
+                   let unitsName = SmallNumbers.names[unitsInt] {
                     parts.append(unitsName)
                 }
             }
@@ -250,7 +256,7 @@ public struct NumberSpeller {
         switch mode {
         case .aviation:
             let map: [Character: String] = ["0":"zero","1":"one","2":"two","3":"tree","4":"four","5":"fife","6":"six","7":"seven","8":"eight","9":"niner"]
-            return fractionString.map { map[$0]! }.joined(separator: " ")
+            return fractionString.map { map[$0] ?? String($0) }.joined(separator: " ")
 
         case .normal:
             // Treat the fraction as a single integer
