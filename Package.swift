@@ -18,13 +18,6 @@ let package = Package(
         .target(
             name: "Math"
         ),
-        .plugin(
-            name: "GenerateDocumentation",
-            capability: .command(
-                intent: .custom(verb: "generate-documentation", description: "Build DocC documentation")
-            ),
-            dependencies: []
-        ),
         .testTarget(
             name: "MathTests",
             dependencies: ["Math"]

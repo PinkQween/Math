@@ -155,13 +155,14 @@ public struct NumberSpeller {
     /// Spells out integer groups with appropriate large number suffixes.
     private static func spellIntegerGroups(_ groups: [String], mode: PronunciationMode) -> String {
         var spelledParts: [String] = []
-        
+
         for (index, groupStr) in groups.enumerated() {
-            guard let groupNum = Int(groupStr), groupNum > 0 else { continue }
+            let groupNum = Math(stringLiteral: groupStr)
+            guard groupNum > 0 else { continue }
+
             let groupName = spellThreeDigits(groupNum, mode: mode)
-            //            let positionFromRight = groups.count - (mode == .aviation ? 1 : 2) - index
             let positionFromRight = groups.count - index - 1
-            
+
             let suffix: String
             switch mode {
             case .aviation:
@@ -178,68 +179,68 @@ public struct NumberSpeller {
                 case 0: suffix = ""
                 case 1: suffix = " thousand"
                 default:
-                    // subtract 1 because "million" is the *first* illion
                     suffix = " " + LargeNumber.name(forIndex: Math(integerLiteral: positionFromRight - 1))
-                }            }
-            
+                }
+            }
+
             spelledParts.append(groupName + suffix)
         }
-        
+
         return spelledParts.joined(separator: " ").trimmingCharacters(in: .whitespaces)
     }
-    
-    /// Spells out a three-digit number according to the pronunciation mode.
-    private static func spellThreeDigits(_ number: Int, mode: PronunciationMode) -> String {
+
+    private static func spellThreeDigits(_ number: Math, mode: PronunciationMode) -> String {
         guard number > 0 else { return "" }
         var n = number
         var parts: [String] = []
-        
+
         let aviationMap: [Int: String] = [
             0: "zero", 1: "one", 2: "two", 3: "tree", 4: "four",
             5: "fife", 6: "six", 7: "seven", 8: "eight", 9: "niner"
         ]
-        
+
         switch mode {
         case .normal:
             if n >= 100 {
                 let hundreds = n / 100
-                if let hundredsStr = SmallNumbers.names[hundreds] {
+                if let hundredsInt = hundreds.asInt, let hundredsStr = SmallNumbers.names[hundredsInt] {
                     parts.append("\(hundredsStr) hundred")
                 }
                 n %= 100
             }
-            
+
             if n >= 20 {
-                let tens = (n / 10) * 10
-                if let tensStr = TensNumbers.names[tens] {
+                if let tensInt = (n / 10 * 10).asInt, let tensStr = TensNumbers.names[tensInt] {
                     parts.append(tensStr)
                 }
                 n %= 10
             }
-            
-            if n > 0, let unitsStr = SmallNumbers.names[n] {
+
+            if n > 0, let unitsInt = n.asInt, let unitsStr = SmallNumbers.names[unitsInt] {
                 parts.append(unitsStr)
             }
-            
+
         case .aviation:
             if n >= 100 {
-                let hundreds = n / 100
-                let hundredsStr = aviationMap[hundreds] ?? "\(hundreds)"
-                parts.append("\(hundredsStr) hundred")
+                if let hundredsInt = (n / 100).asInt {
+                    let hundredsStr = aviationMap[hundredsInt] ?? "\(hundredsInt)"
+                    parts.append("\(hundredsStr) hundred")
+                }
                 n %= 100
             }
-            
+
             if n > 0 {
-                for digitChar in String(n) {
+                for digitChar in n.description {
                     if let digit = Int(String(digitChar)) {
                         parts.append(aviationMap[digit] ?? "\(digit)")
                     }
                 }
             }
         }
-        
+
         return parts.joined(separator: " ")
     }
+
     
     /// Pronounces the fractional part of a decimal number.
     private static func pronounceFraction(_ fraction: Decimal, mode: PronunciationMode) -> String {
