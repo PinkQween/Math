@@ -146,7 +146,7 @@ public struct NumberSpeller {
         for (index, groupStr) in groups.enumerated() {
             guard let groupNum = Int(groupStr), groupNum > 0 else { continue }
             let groupName = spellThreeDigits(groupNum, mode: mode)
-            let positionFromRight = groups.count - 1 - index
+            let positionFromRight = groups.count - (mode == .aviation ? 1 : 2) - index
             
             let suffix: String
             switch mode {

@@ -14,14 +14,14 @@ public extension Math {
     /// Returns the parity of this value.
     ///
     /// - Returns: `.even` if the value is divisible by 2, otherwise `.odd`.
-    var parity: Parity {
+    var getParity: Parity {
         return self % 2 == 0 ? .even : .odd
     }
 
     /// Returns the sign of this value.
     ///
     /// - Returns: `.positive` if greater than zero, `.negative` if less than zero, or `.zero` if equal to zero.
-    var sign: Sign {
+    var getSign: Sign {
         if self < 0 {
             return .negative
         } else if self == 0 {
