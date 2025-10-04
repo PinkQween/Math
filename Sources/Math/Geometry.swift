@@ -21,7 +21,7 @@ public extension Math {
     /// - Parameter x: Angle in degrees or radians based on MathSettings.
     /// - Returns: sin(x) as a Math value.
     ///
-    /// Note: Precision depends on `MathSettings.shared.percision`.
+    /// Note: Precision depends on `MathSettings.shared.precision`.
     static func sin(_ x: Math) -> Math {
         // 1. Get current settings (angle mode and precision)
         let settings = MathSettings.shared
