@@ -109,6 +109,20 @@ struct PronunciationTests {
         #expect(!spelled.isEmpty)
     }
     
+    @Test("Test large integer precision")
+    func testLargeIntegerPrecision() async throws {
+        // Test the specific case that was failing: 9999999999999999999
+        let inputString = "9".appending(String(repeating: "999", count: 6))
+        let mathValue = Math(stringLiteral: inputString)
+        let spelledOut = mathValue.spelledOut
+        
+        // Should not get "nineteen" - should get the full number
+        #expect(spelledOut != "nineteen")
+        #expect(spelledOut.contains("nine sextillion"))
+        #expect(spelledOut.contains("nine hundred ninety nine"))
+        #expect(!spelledOut.isEmpty)
+    }
+    
     @Test("Full test")
     func testFull() async throws {
         #expect(Math(stringLiteral: "-01234567890.123456789").spelledOut == "negative one billion two hundred thirty four million five hundred sixty seven thousand eight hundred ninety and one hundred twenty three million four hundred fifty six thousand seven hundred eighty nine billionths")

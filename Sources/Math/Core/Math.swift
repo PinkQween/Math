@@ -34,10 +34,16 @@ public struct Math: NumberProtocol {
             let scale = parts.count > 1 ? parts[1].count : 0
             let combined = parts.joined()
             self.storage = .bigDecimal(BigInt(combined) ?? .zero, scale: scale)
-        } else if let dblVal = Double(value) {
-            self.storage = .double(dblVal)
         } else {
-            self.storage = .bigInt(BigInt(value) ?? .zero)
+            // For integers larger than Int capacity, use BigInt instead of Double
+            // to avoid scientific notation and precision loss
+            if let bigIntVal = BigInt(value) {
+                self.storage = .bigInt(bigIntVal)
+            } else if let dblVal = Double(value) {
+                self.storage = .double(dblVal)
+            } else {
+                self.storage = .bigInt(.zero)
+            }
         }
     }
 
