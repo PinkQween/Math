@@ -160,7 +160,7 @@ public struct NumberSpeller {
             let groupNum = Math(stringLiteral: groupStr)
             guard groupNum > 0 else { continue }
 
-            let groupName = spellThreeDigits(groupNum, mode: mode)
+            let groupName = spellThreeDigits(groupStr, mode: mode)
             let positionFromRight = groups.count - index - 1
 
             let suffix: String
@@ -189,37 +189,37 @@ public struct NumberSpeller {
         return spelledParts.joined(separator: " ").trimmingCharacters(in: .whitespaces)
     }
 
-    private static func spellThreeDigits(_ number: Math, mode: PronunciationMode) -> String {
-        let numStr = number.description
-        guard numStr != "0" else { return "" }
+    private static func spellThreeDigits(_ numberStr: String, mode: PronunciationMode) -> String {
+        guard numberStr != "000" else { return "" }
 
         var parts: [String] = []
 
         switch mode {
         case .normal:
-            // Pad to 3 digits
-            let padded = String(repeating: "0", count: 3 - numStr.count) + numStr
-            let digits = Array(padded)
+            let digits = Array(numberStr)
 
             // Hundreds
-            if digits[0] != "0", let hundreds = SmallNumbers.names[Int(String(digits[0]))!] {
-                parts.append("\(hundreds) hundred")
+            if digits[0] != "0" {
+                if let hundreds = SmallNumbers.names[Int(String(digits[0]))!] {
+                    parts.append("\(hundreds) hundred")
+                }
             }
 
-            // Tens and units as string
-            let tensUnitsStr = String(digits[1...2])
-            if tensUnitsStr.first == "1" { // 10-19
-                if let teen = SmallNumbers.names[Int(tensUnitsStr)!] {
-                    parts.append(teen)
+            // Tens + Units
+            let tensDigit = digits[1]
+            let unitsDigit = digits[2]
+
+            if tensDigit == "1" { // 10-19
+                let teenIndex = Int(String("\(tensDigit)\(unitsDigit)"))!
+                if let teenName = SmallNumbers.names[teenIndex] {
+                    parts.append(teenName)
                 }
             } else {
-                if let tensDigit = Int(String(digits[1])), tensDigit > 1,
-                   let tensStr = TensNumbers.names[tensDigit * 10] {
-                    parts.append(tensStr)
+                if tensDigit != "0", let tensName = TensNumbers.names[Int(String(tensDigit))! * 10] {
+                    parts.append(tensName)
                 }
-                if let unitsDigit = Int(String(digits[2])), unitsDigit > 0,
-                   let unitsStr = SmallNumbers.names[unitsDigit] {
-                    parts.append(unitsStr)
+                if unitsDigit != "0", let unitsName = SmallNumbers.names[Int(String(unitsDigit))!] {
+                    parts.append(unitsName)
                 }
             }
 
@@ -228,14 +228,14 @@ public struct NumberSpeller {
                 "0": "zero", "1": "one", "2": "two", "3": "tree", "4": "four",
                 "5": "fife", "6": "six", "7": "seven", "8": "eight", "9": "niner"
             ]
-            for digitChar in numStr {
+            for digitChar in numberStr {
                 parts.append(aviationMap[digitChar] ?? String(digitChar))
             }
         }
 
         return parts.joined(separator: " ")
     }
-    
+
     /// Pronounces the fractional part of a decimal number.
     private static func pronounceFraction(_ fraction: Decimal, mode: PronunciationMode) -> String {
         let fractionString = fraction.description.dropFirst(2) // Remove "0."
