@@ -23,7 +23,7 @@
 - **Standard arithmetic**: `+`, `-`, `*`, `/`, `%`
 - **Exponentiation**: `**` (power operator)
 - **Hyperoperations**: `^^` (tetration), `^^^` (pentation), etc.
-- **Factorials**: `!`, `!!` (double), `!!!` (triple), subfactorial `!n`
+- **Factorials**: `~!`, `~!!` (double), `~!!!` (triple), subfactorial `~!n`
 - **Roots**: `|/` (nth root), `√` (alternative syntax)
 - **Trigonometry**: `sin`, `cos`, `asin` with degree/radian support
 - **Numerical calculus**: derivatives, integrals, Taylor series, root finding
