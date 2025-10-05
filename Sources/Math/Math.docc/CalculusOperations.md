@@ -13,13 +13,13 @@ Calculate numerical derivatives using the central difference method.
 #### First Derivative
 
 ```swift
-// Derivative of f(x) = x≤
+// Derivative of f(x) = x¬≤
 let derivative = Math.derivative(of: { x in x * x }, at: 3)
-print(derivative)  // H6 (exact: 2x = 2∑3 = 6)
+print(derivative)  // ‚âà6 (exact: 2x = 2√ó3 = 6)
 
 // Derivative of f(x) = sin(x)
 let sinDerivative = Math.derivative(of: { x in Math.sin(x) }, at: 0)
-print(sinDerivative)  // H1 (exact: cos(0) = 1)
+print(sinDerivative)  // ‚âà1 (exact: cos(0) = 1)
 
 // Custom step size for higher precision
 let preciseDerivative = Math.derivative(
@@ -32,9 +32,9 @@ let preciseDerivative = Math.derivative(
 #### Higher-Order Derivatives
 
 ```swift
-// Second derivative of f(x) = x≤
+// Second derivative of f(x) = x¬≤
 let secondDerivative = Math.secondDerivative(of: { x in x * x }, at: 5)
-print(secondDerivative)  // H2 (constant for quadratic)
+print(secondDerivative)  // ‚âà2 (constant for quadratic)
 
 // Nth derivative
 let fourthDerivative = Math.nthDerivative(
@@ -42,7 +42,7 @@ let fourthDerivative = Math.nthDerivative(
     n: 4,
     at: 1
 )
-print(fourthDerivative)  // H120 (5! / 1! = 120)
+print(fourthDerivative)  // ‚âà120 (5! / 1! = 120)
 ```
 
 ### Integration
@@ -54,18 +54,18 @@ Compute definite integrals using numerical methods.
 Basic integration using trapezoids:
 
 ```swift
-// +Äπ x dx = 0.5
+// ‚à´‚ÇÄ¬π x dx = 0.5
 let integral = Math.integrate({ x in x }, from: 0, to: 1)
-print(integral)  // H0.5
+print(integral)  // ‚âà0.5
 
-// +Ä^¿ sin(x) dx = 2
+// ‚à´‚ÇÄ^œÄ sin(x) dx = 2
 let sinIntegral = Math.integrate(
     { x in Math.sin(x) },
     from: 0,
-    to: .¿,
+    to: .pi,
     intervals: 1000
 )
-print(sinIntegral)  // H2
+print(sinIntegral)  // ‚âà2
 
 // More intervals = higher accuracy
 let precise = Math.integrate(
@@ -81,14 +81,14 @@ let precise = Math.integrate(
 More accurate integration using quadratic approximation:
 
 ```swift
-// +Äπ x≤ dx = 1/3
+// ‚à´‚ÇÄ¬π x¬≤ dx = 1/3
 let integral = Math.simpsonIntegrate(
     { x in x * x },
     from: 0,
     to: 1,
     intervals: 100
 )
-print(integral)  // H0.333...
+print(integral)  // ‚âà0.333...
 
 // Simpson's rule is more accurate for smooth functions
 let accurate = Math.simpsonIntegrate(
@@ -104,15 +104,15 @@ let accurate = Math.simpsonIntegrate(
 Approximate integrals to infinity:
 
 ```swift
-// +Ä^ e^(-x) dx = 1
+// ‚à´‚ÇÄ^‚àû e^(-x) dx = 1
 let improper = Math.improperIntegrate(
     { x in Math.exp(-x) },
     from: 0,
-    upperBound: 10  // Approximate 
+    upperBound: 10  // Approximate infinity
 )
-print(improper)  // H1
+print(improper)  // ‚âà1
 
-// +Å^ 1/x≤ dx = 1
+// ‚à´‚ÇÅ^‚àû 1/x¬≤ dx = 1
 let result = Math.improperIntegrate(
     { x in 1 / (x * x) },
     from: 1,
@@ -147,7 +147,7 @@ let evenSum = Math.arithmeticSeries(
 
 #### Geometric Series
 
-Sum of a + ar + ar≤ + ... for n terms:
+Sum of a + ar + ar¬≤ + ... for n terms:
 
 ```swift
 // 1 + 2 + 4 + 8 + 16 = 31
@@ -190,14 +190,14 @@ let thirdSum = Math.infiniteGeometricSeries(
 Sum arbitrary series using custom term functions:
 
 ```swift
-// Sum of squares: 1≤ + 2≤ + 3≤ + 4≤ + 5≤ = 55
+// Sum of squares: 1¬≤ + 2¬≤ + 3¬≤ + 4¬≤ + 5¬≤ = 55
 let squareSum = Math.sum(from: 1, to: 5) { k in k * k }
 print(squareSum)  // 55
 
 // Sum of reciprocals: 1 + 1/2 + 1/3 + 1/4 + 1/5
 let harmonicSum = Math.sum(from: 1, to: 5) { k in 1 / k }
 
-// Product series (factorial): 1 ∑ 2 ∑ 3 ∑ 4 ∑ 5 = 120
+// Product series (factorial): 1 √ó 2 √ó 3 √ó 4 √ó 5 = 120
 let factorial = Math.product(from: 1, to: 5) { k in k }
 print(factorial)  // 120
 ```
@@ -209,15 +209,15 @@ Approximate limits as x approaches a value or infinity.
 #### Limits at a Point
 
 ```swift
-// lim(xí0) sin(x)/x = 1
+// lim(x‚Üí0) sin(x)/x = 1
 let limit = Math.limit(
     of: { x in Math.sin(x) / x },
     approaching: 0,
     epsilon: 0.00001
 )
-print(limit)  // H1
+print(limit)  // ‚âà1
 
-// lim(xí2) (x≤ - 4)/(x - 2) = 4
+// lim(x‚Üí2) (x¬≤ - 4)/(x - 2) = 4
 let algebraicLimit = Math.limit(
     of: { x in (x * x - 4) / (x - 2) },
     approaching: 2,
@@ -228,11 +228,11 @@ let algebraicLimit = Math.limit(
 #### Limits at Infinity
 
 ```swift
-// lim(xí) 1/x = 0
+// lim(x‚Üí‚àû) 1/x = 0
 let limit = Math.limitAtInfinity(of: { x in 1 / x })
-print(limit)  // H0
+print(limit)  // ‚âà0
 
-// lim(xí) (x≤ + 1)/x≤ = 1
+// lim(x‚Üí‚àû) (x¬≤ + 1)/x¬≤ = 1
 let rationalLimit = Math.limitAtInfinity(
     of: { x in (x * x + 1) / (x * x) },
     largeValue: 100000
@@ -248,20 +248,20 @@ Find zeros of functions using numerical methods.
 Guaranteed convergence if f(a) and f(b) have opposite signs:
 
 ```swift
-// Find 2 by solving x≤ - 2 = 0
+// Find ‚àö2 by solving x¬≤ - 2 = 0
 let root = Math.bisectionRoot(
     of: { x in x * x - 2 },
     in: 0...3,
     tolerance: 0.0001
 )
-print(root)  // H1.414
+print(root)  // ‚âà1.414
 
 // Find zero of sin(x) in [3, 4]
 let sinRoot = Math.bisectionRoot(
     of: { x in Math.sin(x) },
     in: 3...4
 )
-print(sinRoot)  // H¿
+print(sinRoot)  // ‚âàœÄ
 ```
 
 #### Newton's Method
@@ -269,13 +269,13 @@ print(sinRoot)  // H¿
 Faster convergence using derivative information:
 
 ```swift
-// Find 2 starting from x = 1
+// Find ‚àö2 starting from x = 1
 let root = Math.newtonRoot(
     of: { x in x * x - 2 },
     initialGuess: 1,
     tolerance: 0.0001
 )
-print(root)  // H1.414
+print(root)  // ‚âà1.414
 
 // Find root of cubic equation
 let cubicRoot = Math.newtonRoot(
@@ -293,10 +293,10 @@ Approximate functions using Taylor series expansion.
 let sinApprox = Math.taylorSeries(
     of: { x in Math.sin(x) },
     around: 0,
-    at: Math.¿ / 6,
+    at: Math.pi / 6,
     terms: 10
 )
-print(sinApprox)  // H0.5
+print(sinApprox)  // ‚âà0.5
 
 // Approximate e^x around 0
 let expApprox = Math.taylorSeries(
@@ -305,7 +305,7 @@ let expApprox = Math.taylorSeries(
     at: 1,
     terms: 20
 )
-print(expApprox)  // He
+print(expApprox)  // ‚âàe
 ```
 
 ## Real-World Examples
@@ -313,7 +313,7 @@ print(expApprox)  // He
 ### Physics: Velocity and Acceleration
 
 ```swift
-// Position function: s(t) = t≤
+// Position function: s(t) = t¬≤
 let position: MathFunction = { t in t * t }
 
 // Velocity: v(t) = ds/dt = 2t
@@ -322,7 +322,7 @@ print("Velocity at t=3: \(velocity) m/s")  // 6 m/s
 
 // Acceleration: a(t) = dv/dt = 2
 let acceleration = Math.secondDerivative(of: position, at: 3)
-print("Acceleration: \(acceleration) m/s≤")  // 2 m/s≤
+print("Acceleration: \(acceleration) m/s¬≤")  // 2 m/s¬≤
 ```
 
 ### Engineering: Work and Energy
@@ -332,7 +332,7 @@ print("Acceleration: \(acceleration) m/s≤")  // 2 m/s≤
 let k = Math(100)  // Spring constant
 let force: MathFunction = { x in k * x }
 
-// Work = + F(x) dx from xÅ to xÇ
+// Work = ‚à´ F(x) dx from x‚ÇÄ to x‚ÇÅ
 let work = Math.integrate(force, from: 0, to: 0.5)
 print("Work done: \(work) J")  // 12.5 J
 ```
@@ -346,7 +346,7 @@ let cashFlow: MathFunction = { t in
     Math(1000) * Math.exp(-rate * t)
 }
 
-// Present value = +Äπp f(t) dt
+// Present value = ‚à´‚ÇÄ^10 f(t) dt
 let presentValue = Math.integrate(cashFlow, from: 0, to: 10)
 print("Present value: $\(presentValue)")
 ```
@@ -354,16 +354,16 @@ print("Present value: $\(presentValue)")
 ### Statistics: Normal Distribution
 
 ```swift
-// Standard normal PDF: ∆(x) = (1/2¿)e^(-x≤/2)
+// Standard normal PDF: œÜ(x) = (1/‚àö(2œÄ))e^(-x¬≤/2)
 let normalPDF: MathFunction = { x in
-    let coefficient = 1 / Math.sqrt(2 * .¿)
+    let coefficient = 1 / Math.sqrt(2 * .pi)
     let exponent = -(x * x) / 2
     return coefficient * Math.exp(exponent)
 }
 
-// Probability P(-1 d X d 1) H 0.68
+// Probability P(-1 ‚â§ X ‚â§ 1) ‚âà 0.68
 let probability = Math.simpsonIntegrate(normalPDF, from: -1, to: 1)
-print("P(-1 d X d 1) = \(probability)")
+print("P(-1 ‚â§ X ‚â§ 1) = \(probability)")
 ```
 
 ## Topics

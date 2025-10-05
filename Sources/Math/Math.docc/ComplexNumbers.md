@@ -63,10 +63,10 @@ let divided = z1 / Math(2)    // 1.5 + 2i
 ```swift
 let z = Complex(real: 3, imaginary: 4)
 
-print(z.magnitude)  // 5 (|z| = (3� + 4�))
+print(z.magnitude)  // 5 (|z| = √(3² + 4²))
 print(z.abs)        // 5 (alias for magnitude)
 
-print(z.phase)      // H0.927 radians or H53.13�
+print(z.phase)      // ≈0.927 radians or ≈53.13°
 print(z.argument)   // Same as phase
 ```
 

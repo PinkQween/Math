@@ -29,7 +29,7 @@ Statistics that describe the center or typical value of a dataset.
 
 ### Mean (Average)
 
-The arithmetic mean: ¼ = (£x) / n
+The arithmetic mean: sum(x) / n
 
 ```swift
 let data = Statistics([1, 2, 3, 4, 5])
@@ -78,7 +78,7 @@ print("Most common size: \(sizes.mode ?? 0)")  // 9
 
 ### Geometric Mean
 
-The nth root of the product: (  x)^(1/n)
+The nth root of the product: (product x)^(1/n)
 
 Best for growth rates and ratios:
 
@@ -95,7 +95,7 @@ let avgGrowth = growthRates.geometricMean
 
 ### Harmonic Mean
 
-n / (£ 1/x_i)
+n / (sum 1/x_i)
 
 Useful for rates and speeds:
 
@@ -124,12 +124,12 @@ print(data.maximum)  // 10
 
 // Temperature range
 let temps = Statistics([65, 72, 68, 75, 70])
-print("Daily range: \(temps.range ?? 0)°F")  // 10°F
+print("Daily range: \(temps.range ?? 0)F")  // 10F
 ```
 
 ### Variance
 
-Average squared deviation from mean: Ã² = £(x - ¼)² / n
+Average squared deviation from mean: sigma^2 = sum(x - mu)^2 / n
 
 ```swift
 let data = Statistics([1, 2, 3, 4, 5])
@@ -147,7 +147,7 @@ print(highSpread.variance)  // ~52
 
 ### Standard Deviation
 
-Square root of variance: Ã = variance
+Square root of variance: sigma = sqrt(variance)
 
 ```swift
 let data = Statistics([2, 4, 4, 4, 5, 5, 7, 9])
@@ -159,12 +159,12 @@ print(data.sampleStandardDeviation)  // ~2.14
 // Real-world: quality control
 let measurements = Statistics([9.9, 10.0, 10.1, 9.95, 10.05])
 let tolerance = measurements.standardDeviation ?? 0
-print("Standard deviation: ±\(tolerance)")
+print("Standard deviation: +/-\(tolerance)")
 ```
 
 ### Coefficient of Variation
 
-Relative variability: CV = (Ã / ¼) × 100%
+Relative variability: CV = (sigma / mu) x 100%
 
 ```swift
 let data = Statistics([10, 12, 14, 16, 18])
@@ -306,7 +306,7 @@ let heights = Statistics([
 
 if let histogram = heights.frequencyDistribution(bins: 4) {
     for bin in histogram {
-        let bar = String(repeating: " ", count: bin.frequency)
+        let bar = String(repeating: "#", count: bin.frequency)
         print("\(bin.range.lowerBound)-\(bin.range.upperBound): \(bar)")
     }
 }
@@ -426,9 +426,9 @@ let sd = weights.standardDeviation ?? 0
 
 print("Target: 100g")
 print("Actual mean: \(mean)g")
-print("Standard deviation: ±\(sd)g")
+print("Standard deviation: \(sd)g")
 
-// Check if within tolerance (±0.5g)
+// Check if within tolerance (0.5g)
 let withinTolerance = weights.data.allSatisfy { weight in
     abs(weight - Math(100)) <= Math(0.5)
 }
@@ -444,7 +444,7 @@ let grades = Statistics([
 ])
 
 print("Class Performance")
-print("                 ")
+print("=================")
 print("Mean: \(grades.mean ?? 0)")
 print("Median: \(grades.median ?? 0)")
 print("Range: \(grades.minimum ?? 0) - \(grades.maximum ?? 0)")
@@ -475,7 +475,7 @@ let monthlySales = Statistics([
 ])
 
 print("Annual Sales Report")
-print("                  ")
+print("==================")
 print("Total: $\(monthlySales.data.reduce(0, +))")
 print("Average: $\(monthlySales.mean ?? 0)")
 print("Best month: $\(monthlySales.maximum ?? 0)")
