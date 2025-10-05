@@ -22,6 +22,23 @@ We follow [Semantic Versioning](https://semver.org/) (SemVer):
 **Swift**: 6.1+
 **Platforms**: macOS, Linux
 
+## Quick Commit and Push
+
+For regular commits (not releases), use the `commit-and-push.sh` script:
+
+```bash
+# Simple commit and push
+./scripts/commit-and-push.sh "Fix bug in statistics module"
+
+# Commit with documentation rebuild
+./scripts/commit-and-push.sh "Update complex numbers tutorial" --with-docs
+```
+
+This script:
+- Commits all changes with your message
+- Pushes to the current branch
+- Optionally rebuilds and deploys documentation (with `--with-docs` flag)
+
 ## Release Checklist
 
 ### Before Release
@@ -36,36 +53,67 @@ We follow [Semantic Versioning](https://semver.org/) (SemVer):
 
 ### Creating a Release
 
+We provide automated scripts to streamline the release process.
+
+#### Using the Release Script (Recommended)
+
+The `release.sh` script automates the entire release process:
+
+```bash
+# Usage: ./scripts/release.sh <commit-message> <version>
+./scripts/release.sh "Release with new features" 0.2.0
+```
+
+This script will:
+1. ✅ Run all tests
+2. 🔨 Build release version
+3. ✅ Check CHANGELOG.md for version entry
+4. 📚 Build and deploy documentation
+5. 💾 Commit all changes with your message
+6. 🏷️ Create git tag
+7. 🚀 Push to GitHub (main branch + tag)
+
+**Requirements:**
+- Must be on `main` branch
+- CHANGELOG.md should have section for version
+- All changes should be staged or saved
+
+#### Manual Release Process
+
+If you prefer manual control:
+
 1. **Update Version Information**
    ```bash
-   # Update CHANGELOG.md with release date
+   # Update CHANGELOG.md with release date and all changes
    # Add new [Unreleased] section for future changes
    ```
 
-2. **Commit Changes**
+2. **Build Documentation**
    ```bash
-   git add .
-   git commit -m "Release v0.1.0"
+   ./scripts/deploy-docs.sh
    ```
 
-3. **Create Git Tag**
+3. **Commit Changes**
    ```bash
-   git tag -a v0.1.0 -m "Release version 0.1.0"
+   git add -A
+   git commit -m "Release v0.2.0"
    ```
 
-4. **Push to GitHub**
+4. **Create Git Tag**
+   ```bash
+   git tag -a v0.2.0 -m "Release version 0.2.0"
+   ```
+
+5. **Push to GitHub**
    ```bash
    git push origin main
-   git push origin v0.1.0
+   git push origin v0.2.0
    ```
 
-5. **Create GitHub Release**
-   - Go to: https://github.com/PinkQween/Math/releases/new
-   - Select the tag: `v0.1.0`
-   - Title: `v0.1.0 - Initial Alpha Release`
-   - Description: Copy from CHANGELOG.md
-   - Check "This is a pre-release" for alpha/beta versions
-   - Click "Publish release"
+6. **GitHub Release (Automatic)**
+   - GitHub Actions will automatically create a release
+   - Go to https://github.com/PinkQween/Math/releases to verify
+   - Edit the release notes if needed
 
 ### After Release
 

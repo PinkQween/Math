@@ -3,45 +3,32 @@ set -e
 
 echo "🔨 Building DocC documentation..."
 
-# Build the package to ensure symbols exist
-swift build --target Math
+# Build documentation using xcodebuild
+xcodebuild docbuild \
+    -scheme Math \
+    -destination 'platform=macOS' \
+    2>&1 | grep -E "BUILD|SUCCEEDED|FAILED|Error" || true
 
-# Generate DocC documentation directly under docs/documentation/math
-xcrun docc convert Sources/Math \
-    --output-path ./docs/documentation/math \
-    --transform-for-static-hosting \
-    --hosting-base-path /documentation/math
+# Find the generated .doccarchive
+DOCC_ARCHIVE=$(find ~/Library/Developer/Xcode/DerivedData -name "Math.doccarchive" -type d 2>/dev/null | head -1)
 
-echo "✅ Documentation built successfully"
+if [ -z "$DOCC_ARCHIVE" ]; then
+    echo "❌ Error: Could not find Math.doccarchive"
+    exit 1
+fi
+
+echo "✅ Documentation built successfully at: $DOCC_ARCHIVE"
+
+# Clear old docs and copy new ones
+echo "📦 Deploying documentation to docs/..."
+rm -rf docs/*
+cp -R "$DOCC_ARCHIVE"/* docs/
+
+# Add CNAME for custom domain
+echo "math.hannaskairipa.com" > docs/CNAME
 
 # Disable Jekyll for GitHub Pages
-touch ./docs/.nojekyll
+touch docs/.nojekyll
 
-# Optional: Create a README or index.html at root if needed for GitHub Pages
-cat > ./docs/README.md << 'EOF'
-# Math Documentation
-
-The Math documentation is available [here](documentation/math/).
-EOF
-
-echo "✅ Documentation prepared for deployment"
-
-# --- Fix generated index.html for proper base paths ---
-INDEX_FILE="./docs/documentation/math/index.html"
-
-if [ -f "$INDEX_FILE" ]; then
-    echo "🔧 Updating index.html paths for hosting base"
-
-    # Insert <base> tag after <head> open
-    sed -i '' '/<head>/a\
-    <base href="/documentation/math/">
-    ' "$INDEX_FILE"
-
-    # Remove leading slashes from JS and CSS paths
-    sed -i '' -E 's/src="\/documentation\/math\/(js\/[^"]+)"/src="\1"/g' "$INDEX_FILE"
-    sed -i '' -E 's/href="\/documentation\/math\/(css\/[^"]+)"/href="\1"/g' "$INDEX_FILE"
-
-    echo "✅ index.html updated for correct relative paths"
-else
-    echo "⚠️  index.html not found at $INDEX_FILE"
-fi
+echo "✅ Documentation deployed to docs/ directory"
+echo "📝 Files ready for git commit"

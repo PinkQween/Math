@@ -1,32 +1,28 @@
 #!/bin/bash
 
 # Release script for Math library
-# Usage: ./scripts/release.sh <version>
-# Example: ./scripts/release.sh 0.1.0
+# Usage: ./scripts/release.sh <commit-message> <version>
+# Example: ./scripts/release.sh "Add new statistics module" 0.2.0
 
 set -e
 
-if [ -z "$1" ]; then
-    echo "Usage: $0 <version>"
-    echo "Example: $0 0.1.0"
+if [ -z "$1" ] || [ -z "$2" ]; then
+    echo "Usage: $0 <commit-message> <version>"
+    echo "Example: $0 \"Add new statistics module\" 0.2.0"
     exit 1
 fi
 
-VERSION=$1
+COMMIT_MESSAGE=$1
+VERSION=$2
 TAG="v$VERSION"
 
 echo "🚀 Preparing release $VERSION"
+echo "📝 Commit message: $COMMIT_MESSAGE"
 
 # Check if we're on main branch
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 if [ "$BRANCH" != "main" ]; then
     echo "❌ Error: Must be on main branch to release"
-    exit 1
-fi
-
-# Check if working directory is clean
-if ! git diff-index --quiet HEAD --; then
-    echo "❌ Error: Working directory is not clean. Commit or stash changes first."
     exit 1
 fi
 
@@ -53,6 +49,18 @@ if ! grep -q "## \[$VERSION\]" CHANGELOG.md; then
     fi
 fi
 
+echo "📚 Building and deploying documentation..."
+./scripts/deploy-docs.sh
+
+echo "💾 Committing changes..."
+git add -A
+if git diff --staged --quiet; then
+    echo "ℹ️  No changes to commit"
+else
+    git commit -m "$COMMIT_MESSAGE"
+    echo "✅ Changes committed"
+fi
+
 echo "✅ Creating git tag $TAG..."
 git tag -a "$TAG" -m "Release version $VERSION"
 
@@ -63,9 +71,17 @@ git push origin "$TAG"
 echo ""
 echo "🎉 Release $VERSION complete!"
 echo ""
+echo "What was done:"
+echo "✓ Tests passed"
+echo "✓ Release build successful"
+echo "✓ Documentation built and deployed"
+echo "✓ Changes committed with message: \"$COMMIT_MESSAGE\""
+echo "✓ Tag $TAG created"
+echo "✓ Pushed to GitHub"
+echo ""
 echo "Next steps:"
 echo "1. Go to https://github.com/PinkQween/Math/releases"
 echo "2. The release should be created automatically by GitHub Actions"
 echo "3. Verify the release and edit if needed"
-echo "4. Announce the release if desired"
+echo "4. Documentation is live at https://math.hannaskairipa.com"
 echo ""
