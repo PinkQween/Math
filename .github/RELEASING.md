@@ -5,21 +5,21 @@
 For a quick release of version `X.Y.Z`:
 
 ```bash
-# 1. Make sure everything is ready
-swift test                    # All tests must pass
-swift build -c release       # Must build successfully
-
-# 2. Update CHANGELOG.md
+# 1. Update CHANGELOG.md
 # - Add release date to version section
 # - Create new [Unreleased] section at top
 
-# 3. Commit and run release script
-git add .
-git commit -m "Prepare release vX.Y.Z"
-./scripts/release.sh X.Y.Z
+# 2. Run release script (handles everything automatically)
+./scripts/release.sh "Release vX.Y.Z with new features" X.Y.Z
 ```
 
-That's it! The GitHub Action will handle creating the release automatically.
+That's it! The script will:
+- Run tests
+- Build release
+- Build and deploy documentation to https://math.hannaskairipa.com
+- Commit changes
+- Create and push tag
+- GitHub Action will create the release automatically
 
 ---
 
@@ -75,24 +75,26 @@ git push origin main
 
 ### 4. Create Release
 
-Option A - Use the script (recommended):
+Use the automated release script (recommended):
 ```bash
-./scripts/release.sh X.Y.Z
+./scripts/release.sh "Release vX.Y.Z - Summary of changes" X.Y.Z
 ```
 
-Option B - Manual:
-```bash
-git tag -a vX.Y.Z -m "Release version X.Y.Z"
-git push origin main
-git push origin vX.Y.Z
-```
+The script automatically:
+- Runs tests
+- Builds release version
+- Builds and deploys documentation
+- Commits all changes with your message
+- Creates and pushes git tag
+- Deploys docs to https://math.hannaskairipa.com
 
 ### 5. Verify Release
 
 1. Go to https://github.com/PinkQween/Math/actions
 2. Watch the "Release" workflow complete
 3. Check https://github.com/PinkQween/Math/releases
-4. Edit release notes if needed
+4. Verify documentation at https://math.hannaskairipa.com
+5. Edit release notes if needed
 
 ### 6. Test Installation
 

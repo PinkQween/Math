@@ -85,6 +85,8 @@ Follow [Apple's Swift API Design Guidelines](https://swift.org/documentation/api
 
 ### Documentation
 
+**📖 Live Documentation:** [https://math.hannaskairipa.com](https://math.hannaskairipa.com)
+
 All public APIs must include comprehensive documentation:
 
 ```swift

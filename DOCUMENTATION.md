@@ -1,6 +1,17 @@
 # Documentation Guide
 
-This document explains how to build, preview, and deploy the Math library documentation to GitHub Pages.
+This document explains how to build, preview, and deploy the Math library documentation.
+
+## Live Documentation
+
+**📖 View Documentation:** [https://math.hannaskairipa.com](https://math.hannaskairipa.com)
+
+The complete documentation includes:
+- Complex Numbers tutorial and API reference
+- Calculus Operations (derivatives, integrals, series, limits)
+- Statistical Analysis (40+ statistical functions)
+- All core features, units, and constants
+- 100+ code examples
 
 ## Overview
 
@@ -12,12 +23,17 @@ The Math library uses **Swift-DocC** (Documentation Compiler) to generate beauti
 Math/
 ├── Sources/Math/Math.docc/        # DocC catalog
 │   ├── Math.md                    # Landing page
+│   ├── ComplexNumbers.md          # Complex numbers tutorial
+│   ├── CalculusOperations.md      # Calculus tutorial
+│   ├── StatisticalAnalysis.md     # Statistics tutorial
 │   ├── Arithmetic.md              # Arithmetic guide
 │   ├── Trigonometry.md            # Trigonometry guide
 │   └── ...                        # Other topic pages
-├── docs/                          # Generated HTML (for GitHub Pages)
+├── docs/                          # Generated HTML (deployed to GitHub Pages)
 ├── scripts/
-│   └── deploy-docs.sh             # Deployment script
+│   ├── deploy-docs.sh             # Documentation deployment script
+│   ├── release.sh                 # Release script (builds docs automatically)
+│   └── commit-and-push.sh         # Quick commit script
 └── DOCUMENTATION.md               # This file
 ```
 
@@ -66,34 +82,35 @@ docc preview Sources/Math/Math.docc \
 
 ## Deploying to GitHub Pages
 
-The library provides multiple deployment options. Choose the one that best fits your workflow.
+Documentation is automatically deployed to [https://math.hannaskairipa.com](https://math.hannaskairipa.com) when you push to the `main` branch.
 
-### Quick Deploy (Using the Script)
+### Automated Deployment
+
+Use the provided scripts for automatic deployment:
 
 ```bash
-# Run the deployment script
-./scripts/deploy-docs.sh
+# Option 1: Regular commit with documentation rebuild
+./scripts/commit-and-push.sh "Update documentation" --with-docs
 
-# Then deploy using one of the options the script suggests
+# Option 2: Release (automatically builds and deploys docs)
+./scripts/release.sh "Release v0.2.0" 0.2.0
 ```
 
-### Option 1: Git Subtree (Recommended - Preserves History)
+### Manual Deployment
 
-This method maintains the commit history of your documentation.
+If you need to deploy documentation manually:
 
 ```bash
 # 1. Build documentation
 ./scripts/deploy-docs.sh
 
-# 2. Commit the docs
+# 2. Commit and push
 git add docs/
 git commit -m "Update documentation"
-
-# 3. Deploy to gh-pages branch
-git subtree split --prefix docs -b gh-pages
-git push -f origin gh-pages:gh-pages
-git branch -D gh-pages
+git push origin main
 ```
+
+GitHub Pages will automatically deploy from the `docs/` directory on the `main` branch.
 
 **Advantages:**
 - Preserves documentation history
@@ -215,10 +232,10 @@ After deploying, enable GitHub Pages in your repository settings:
 
 1. Go to repository **Settings** → **Pages**
 2. Source: **Deploy from a branch**
-3. Branch: **gh-pages** / **root**
+3. Branch: **main** / **docs**
 4. Click **Save**
 
-Documentation will be available at: `https://YOUR_USERNAME.github.io/Math/`
+Documentation is available at: [https://math.hannaskairipa.com](https://math.hannaskairipa.com)
 
 ## Writing Documentation
 

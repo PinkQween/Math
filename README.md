@@ -12,6 +12,9 @@
 
 ### 🔢 Core Mathematics
 - **Arbitrary-precision arithmetic** using `BigInt` and `BigDecimal`
+- **Complex numbers** with rectangular and polar forms
+- **Calculus operations** including derivatives, integrals, series, and limits
+- **Statistical analysis** with 40+ functions for data analysis
 - **Dynamic number handling** - integers, doubles, and large numbers seamlessly
 - **Operator overloading** for intuitive Swift-native syntax
 - **Thread-safe global settings** for precision and angle modes
@@ -23,6 +26,7 @@
 - **Factorials**: `!`, `!!` (double), `!!!` (triple), subfactorial `!n`
 - **Roots**: `|/` (nth root), `√` (alternative syntax)
 - **Trigonometry**: `sin`, `cos`, `asin` with degree/radian support
+- **Numerical calculus**: derivatives, integrals, Taylor series, root finding
 
 ### 🎯 50+ Number Properties
 - **Prime classifications**: prime, Sophie Germain, safe, twin, cousin, sexy, Mersenne, Fermat
@@ -109,11 +113,37 @@ if let distanceInFeet = meters.convert(distance, to: feet) {
 // Work with exotic units
 let parsecs = ExoticUnits.parsec
 let smoot = ExoticUnits.smoot  // MIT's favorite unit!
+
+// Complex numbers
+let z1 = Complex(real: 3, imaginary: 4)
+let z2 = Complex(real: 1, imaginary: -2)
+let product = z1 * z2              // Complex multiplication
+print(z1.magnitude)                // 5.0
+
+// Calculus
+let derivative = Math.derivative(of: { x in x * x }, at: 3)  // ≈6
+let integral = Math.integrate({ x in x * x }, from: 0, to: 1)  // ≈0.333
+
+// Statistics
+let data = Statistics([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+print(data.mean)                   // 5.5
+print(data.standardDeviation)      // ≈2.87
 ```
 
 ## 📚 Documentation
 
-### Number Properties
+**📖 Full Documentation:** [https://math.hannaskairipa.com](https://math.hannaskairipa.com)
+
+The complete documentation includes:
+- **Complex Numbers**: Comprehensive tutorial and API reference
+- **Calculus Operations**: Derivatives, integrals, series, limits, root finding
+- **Statistical Analysis**: 40+ statistical functions for data analysis
+- **All Core Features**: Number properties, units, constants, and more
+- **100+ Code Examples**: Real-world usage examples and patterns
+
+### Quick Reference
+
+#### Number Properties
 
 #### Basic Properties
 ```swift
