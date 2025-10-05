@@ -30,5 +30,21 @@ echo "math.hannaskairipa.com" > docs/CNAME
 # Disable Jekyll for GitHub Pages
 touch docs/.nojekyll
 
+# Add redirect index.html to documentation/math
+cat > docs/index.html <<'EOF'
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting...</title>
+    <meta http-equiv="refresh" content="0; url=documentation/math/">
+    <link rel="canonical" href="documentation/math/">
+  </head>
+  <body>
+    <p>If you are not redirected, <a href="documentation/math/">click here</a>.</p>
+  </body>
+</html>
+EOF
+
 echo "✅ Documentation deployed to docs/ directory"
 echo "📝 Files ready for git commit"
