@@ -4,7 +4,7 @@ Work with complex numbers in rectangular and polar forms.
 
 ## Overview
 
-The ``Complex`` type provides comprehensive support for complex number arithmetic and operations. Complex numbers extend the real number system by introducing the imaginary unit `i`, where `i² = -1`.
+The ``Complex`` type provides comprehensive support for complex number arithmetic and operations. Complex numbers extend the real number system by introducing the imaginary unit `i`, where `i^2 = -1`.
 
 ### Creating Complex Numbers
 
@@ -25,11 +25,11 @@ let alsoReal = Complex(Math(5)) // Convenience initializer
 let imagNum = Complex(real: 0, imaginary: 3)  // 0 + 3i
 ```
 
-#### Polar Form (r ¸)
+#### Polar Form (r ï¿½)
 
 ```swift
 // Create from magnitude and phase
-let polar = Complex(magnitude: 5, phase: Math.À / 4)
+let polar = Complex(magnitude: 5, phase: Math.ï¿½ / 4)
 
 // The phase angle respects MathSettings.angleMode
 Calculate(settings: .init(angleMode: .degrees)) {
@@ -63,10 +63,10 @@ let divided = z1 / Math(2)    // 1.5 + 2i
 ```swift
 let z = Complex(real: 3, imaginary: 4)
 
-print(z.magnitude)  // 5 (|z| = (3² + 4²))
+print(z.magnitude)  // 5 (|z| = (3ï¿½ + 4ï¿½))
 print(z.abs)        // 5 (alias for magnitude)
 
-print(z.phase)      // H0.927 radians or H53.13°
+print(z.phase)      // H0.927 radians or H53.13ï¿½
 print(z.argument)   // Same as phase
 ```
 
@@ -78,9 +78,9 @@ The conjugate of a complex number flips the sign of the imaginary part:
 let z = Complex(real: 3, imaginary: 4)
 let conjugate = z.conjugate  // 3 - 4i
 
-// Property: z · z* = |z|²
+// Property: z ï¿½ z* = |z|ï¿½
 let product = z * z.conjugate
-print(product.real)  // 25 (= 5²)
+print(product.real)  // 25 (= 5ï¿½)
 print(product.imaginary)  // 0
 ```
 
@@ -113,15 +113,15 @@ let sqrtResult = Complex.sqrt(z)
 
 // General power (uses exp and ln)
 let w = Complex(real: 2, imaginary: 0)
-let power = Complex.pow(z, w)  // z²
+let power = Complex.pow(z, w)  // zï¿½
 ```
 
 #### Exponential and Logarithm
 
 ```swift
-let z = Complex(real: 1, imaginary: Math.À)
+let z = Complex(real: 1, imaginary: Math.ï¿½)
 
-// Euler's formula: e^(iÀ) = -1
+// Euler's formula: e^(iï¿½) = -1
 let exp = Complex.exp(z)  // H-e + 0i
 
 // Natural logarithm
@@ -161,7 +161,7 @@ Complex.i     // 0 + 1i (imaginary unit)
 
 ### Solving Quadratic Equations
 
-Solve ax² + bx + c = 0 for complex roots:
+Solve axï¿½ + bx + c = 0 for complex roots:
 
 ```swift
 func solveQuadratic(a: Math, b: Math, c: Math) -> (Complex, Complex) {
@@ -183,7 +183,7 @@ func solveQuadratic(a: Math, b: Math, c: Math) -> (Complex, Complex) {
     }
 }
 
-// Example: x² + 1 = 0
+// Example: xï¿½ + 1 = 0
 let (r1, r2) = solveQuadratic(a: 1, b: 0, c: 1)
 print(r1)  // 0 + 1i
 print(r2)  // 0 - 1i
@@ -195,22 +195,22 @@ Calculate total impedance in AC circuits:
 
 ```swift
 // Resistor: Z = R
-let resistor = Complex(real: 100)  // 100©
+let resistor = Complex(real: 100)  // 100ï¿½
 
-// Capacitor: Z = -i/(ÉC)
+// Capacitor: Z = -i/(ï¿½C)
 let frequency = Math(60)  // 60 Hz
-let capacitance = Math(0.0001)  // 100¼F
-let omega = 2 * .À * frequency
+let capacitance = Math(0.0001)  // 100ï¿½F
+let omega = 2 * .ï¿½ * frequency
 let capacitor = Complex(real: 0, imaginary: -1 / (omega * capacitance))
 
-// Inductor: Z = iÉL
+// Inductor: Z = iï¿½L
 let inductance = Math(0.1)  // 100mH
 let inductor = Complex(real: 0, imaginary: omega * inductance)
 
 // Series circuit
 let totalImpedance = resistor + capacitor + inductor
 print("Total impedance: \(totalImpedance)")
-print("Magnitude: \(totalImpedance.magnitude) ©")
+print("Magnitude: \(totalImpedance.magnitude) ï¿½")
 print("Phase: \(totalImpedance.phase) radians")
 ```
 

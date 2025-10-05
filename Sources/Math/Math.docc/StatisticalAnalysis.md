@@ -151,10 +151,10 @@ Square root of variance: Ã = variance
 
 ```swift
 let data = Statistics([2, 4, 4, 4, 5, 5, 7, 9])
-print(data.standardDeviation)  // H2
+print(data.standardDeviation)  // ~2
 
 // Sample standard deviation
-print(data.sampleStandardDeviation)  // H2.14
+print(data.sampleStandardDeviation)  // ~2.14
 
 // Real-world: quality control
 let measurements = Statistics([9.9, 10.0, 10.1, 9.95, 10.05])
