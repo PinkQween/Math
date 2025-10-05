@@ -95,8 +95,9 @@ public enum ALUOperation: Int, CaseIterable {
 ///
 /// ### Flags
 /// - Zero: Result is all zeros
-/// - Carry: Arithmetic overflow/carry out
-/// - Negative: MSB of result is 1
+/// - Carry: Unsigned overflow/carry out (for ADD/SUB operations)
+/// - Overflow: Signed overflow (when result sign is incorrect)
+/// - Negative: MSB of result is 1 (sign bit in two's complement)
 ///
 /// ### Example Usage
 /// ```swift
@@ -121,6 +122,7 @@ public class ALU: LogicGate {
     public let output: Bus
     public let zero: Wire
     public let carry: Wire
+    public let overflow: Wire
     public let negative: Wire
 
     private let width: Int
@@ -162,6 +164,7 @@ public class ALU: LogicGate {
         // Create flag wires
         self.zero = Wire(name: "\(name)_zero")
         self.carry = Wire(name: "\(name)_carry")
+        self.overflow = Wire(name: "\(name)_overflow")
         self.negative = Wire(name: "\(name)_neg")
 
         // Create adder
@@ -249,6 +252,28 @@ public class ALU: LogicGate {
             return Signal(allZero)
         }
 
+        // Overflow flag: signed overflow detection
+        // Overflow = (A_sign == B_sign) && (A_sign != Result_sign)
+        overflow.addDriver { [weak self] in
+            guard let self = self else { return .undefined }
+            guard let opValue = self.opcode.intValue else { return .undefined }
+
+            // Only relevant for ADD and SUB operations
+            if opValue != ALUOperation.add.rawValue && opValue != ALUOperation.subtract.rawValue {
+                return .low
+            }
+
+            let aMSB = self.inputA.wires[self.width - 1].signal
+            let bMSB = self.inputB.wires[self.width - 1].signal
+            let resultMSB = self.output.wires[self.width - 1].signal
+
+            // Overflow occurs when signs of operands match but result sign differs
+            let signsMatch = aMSB == bMSB
+            let resultDiffers = aMSB != resultMSB
+
+            return Signal(signsMatch && resultDiffers)
+        }
+
         // Negative flag: MSB is 1
         negative.addDriver { [weak self] in
             guard let self = self else { return .undefined }
@@ -310,6 +335,7 @@ public class ALU: LogicGate {
         // Update flags
         zero.update()
         carry.update()
+        overflow.update()
         negative.update()
     }
 

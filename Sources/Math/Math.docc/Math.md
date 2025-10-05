@@ -16,6 +16,8 @@ The Math library provides arbitrary-precision arithmetic, extensive unit convers
 - **Advanced Operations**: Hyperoperations, factorials, roots, and complete trigonometry
 - **50+ Number Properties**: Prime detection, special numbers, and mathematical classifications
 - **Triangle Solver**: Solve triangles with any 3 known values using Law of Sines and Cosines
+- **3D Graphics**: Vectors, quaternions, matrices, and transforms for 3D rendering
+- **Digital Circuits**: Complete circuit simulator with transistors, gates, registers, and ALU
 
 ## Topics
 
@@ -62,6 +64,22 @@ The Math library provides arbitrary-precision arithmetic, extensive unit convers
 
 - ``Matrix``
 - ``Vertex``
+- ``Vector2``
+- ``Vector3``
+- ``Vector4``
+- ``Quaternion``
+- ``Transform``
+- ``BooleanExpression``
+
+### Digital Circuits
+
+- <doc:CircuitSimulation>
+- ``Signal``
+- ``Wire``
+- ``Bus``
+- ``ALU``
+- ``Register``
+- ``CircuitSimulator``
 
 ### Utilities
 
@@ -129,6 +147,15 @@ let data = Statistics([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 print(data.mean)  // 5.5
 print(data.median)  // 5.5
 print(data.summary)  // Full statistical summary
+
+// Digital circuits
+let alu = ALU(width: 8, name: "alu")
+alu.inputA.setValue(15)
+alu.inputB.setValue(3)
+alu.setOperation(.add)
+alu.update()
+print(alu.output.intValue)  // 18
+print(alu.zero.signal)      // .low
 ```
 
 ## See Also
