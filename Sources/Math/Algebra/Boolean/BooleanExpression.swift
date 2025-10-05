@@ -95,11 +95,11 @@ public indirect enum BooleanExpression: Equatable, CustomStringConvertible, Send
 
         case .xor(let lhs, let rhs):
             guard let left = lhs.evaluate(variables), let right = rhs.evaluate(variables) else { return nil }
-            return LogicGate.xor(left, right)
+            return BooleanGates.xor(left, right)
 
         case .implies(let lhs, let rhs):
             guard let left = lhs.evaluate(variables), let right = rhs.evaluate(variables) else { return nil }
-            return LogicGate.imply(left, right)
+            return BooleanGates.imply(left, right)
         }
     }
 

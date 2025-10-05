@@ -42,7 +42,7 @@ echo "✅ Checking CHANGELOG.md..."
 if ! grep -q "## \[$VERSION\]" CHANGELOG.md; then
     echo "⚠️  Warning: CHANGELOG.md doesn't contain section for version $VERSION"
     echo "   Please update CHANGELOG.md before continuing"
-    read -p "Continue anyway? (y/n) " -n 1 -r
+    read -p "Continue anyway? (y/N) " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         exit 1

@@ -5,22 +5,22 @@
 //  Boolean logic gates and operations
 //
 
-/// Common logic gates used in Boolean algebra and digital circuits.
+/// Common logic gates used in Boolean algebra.
 ///
-/// Logic gates are fundamental building blocks of digital circuits that
-/// perform basic logical operations on one or more binary inputs.
+/// Logic gates are fundamental building blocks that perform basic logical
+/// operations on one or more binary inputs.
 ///
 /// ### Example Usage
 /// ```swift
 /// let a = true
 /// let b = false
 ///
-/// let andResult = LogicGate.and(a, b)    // false
-/// let orResult = LogicGate.or(a, b)      // true
-/// let xorResult = LogicGate.xor(a, b)    // true
-/// let notA = LogicGate.not(a)            // false
+/// let andResult = BooleanGates.and(a, b)    // false
+/// let orResult = BooleanGates.or(a, b)      // true
+/// let xorResult = BooleanGates.xor(a, b)    // true
+/// let notA = BooleanGates.not(a)            // false
 /// ```
-public enum LogicGate {
+public enum BooleanGates {
 
     // MARK: - Basic Gates
 
