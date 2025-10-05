@@ -20,8 +20,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Swift
-        uses: swift-actions/setup-swift@latest
+      - name: Set up Swift 6
+        uses: SwiftyLab/setup-swift@latest
         with:
           swift-version: '6'
 
