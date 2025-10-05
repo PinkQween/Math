@@ -9,6 +9,9 @@ The Math library provides arbitrary-precision arithmetic, extensive unit convers
 ### Key Features
 
 - **Arbitrary-Precision Arithmetic**: Handle numbers of any size with BigInt integration
+- **Complex Numbers**: Full support for complex arithmetic in rectangular and polar forms
+- **Calculus Operations**: Numerical derivatives, integrals, series, limits, and root finding
+- **Statistical Analysis**: Comprehensive statistics with 40+ functions for data analysis
 - **200+ Units**: Comprehensive unit system with automatic conversions
 - **Advanced Operations**: Hyperoperations, factorials, roots, and complete trigonometry
 - **50+ Number Properties**: Prime detection, special numbers, and mathematical classifications
@@ -19,8 +22,16 @@ The Math library provides arbitrary-precision arithmetic, extensive unit convers
 ### Core Types
 
 - ``Math``
+- ``Complex``
+- ``Statistics``
 - ``MathSettings``
 - ``MathStorage``
+
+### New Features
+
+- <doc:ComplexNumbers>
+- <doc:CalculusOperations>
+- <doc:StatisticalAnalysis>
 
 ### Arithmetic Operations
 
@@ -99,6 +110,25 @@ let power = Math(2) ** Math(10)  // 1024
 if Math(17).isPrime {
     print("17 is prime!")
 }
+
+// Complex numbers
+let z1 = Complex(real: 3, imaginary: 4)
+let z2 = Complex(real: 1, imaginary: -2)
+let product = z1 * z2
+print(product.magnitude)  // Magnitude of result
+
+// Calculus
+let derivative = Math.derivative(of: { x in x * x }, at: 3)
+print(derivative)  // ≈ 6
+
+let integral = Math.integrate({ x in x * x }, from: 0, to: 1)
+print(integral)  // ≈ 1/3
+
+// Statistics
+let data = Statistics([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+print(data.mean)  // 5.5
+print(data.median)  // 5.5
+print(data.summary)  // Full statistical summary
 ```
 
 ## See Also

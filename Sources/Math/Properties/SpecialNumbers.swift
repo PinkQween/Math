@@ -16,10 +16,10 @@ public extension Math {
     /// Examples: 6 = 1+2+3, 28 = 1+2+4+7+14, 496, 8128.
     var isPerfect: Bool {
         guard let n = self.asInt, n > 1 else { return false }
-
+        
         var sum = 1
         let limit = Int(Double(n).squareRoot())
-
+        
         for i in 2...limit {
             if n % i == 0 {
                 sum += i
@@ -28,20 +28,20 @@ public extension Math {
                 }
             }
         }
-
+        
         return sum == n
     }
-
+    
     /// Returns `true` if this number is an abundant number.
     ///
     /// An abundant number is less than the sum of its proper divisors.
     /// Example: 12 < 1+2+3+4+6 = 16
     var isAbundant: Bool {
         guard let n = self.asInt, n > 1 else { return false }
-
+        
         var sum = 1
         let limit = Int(Double(n).squareRoot())
-
+        
         for i in 2...limit {
             if n % i == 0 {
                 sum += i
@@ -50,20 +50,20 @@ public extension Math {
                 }
             }
         }
-
+        
         return sum > n
     }
-
+    
     /// Returns `true` if this number is a deficient number.
     ///
     /// A deficient number is greater than the sum of its proper divisors.
     /// Most numbers are deficient. Examples: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17...
     var isDeficient: Bool {
         guard let n = self.asInt, n > 1 else { return false }
-
+        
         var sum = 1
         let limit = Int(Double(n).squareRoot())
-
+        
         for i in 2...limit {
             if n % i == 0 {
                 sum += i
@@ -72,23 +72,23 @@ public extension Math {
                 }
             }
         }
-
+        
         return sum < n
     }
-
+    
     /// Returns `true` if this number is a triangular number.
     ///
     /// Triangular numbers are the sum of first n natural numbers: 1, 3, 6, 10, 15, 21, 28, 36, 45...
     /// Formula: T(n) = n(n+1)/2
     var isTriangular: Bool {
         guard let n = self.asInt, n >= 0 else { return false }
-
+        
         // A number is triangular if 8n+1 is a perfect square
         let candidate = 8 * n + 1
         let root = Int(Double(candidate).squareRoot())
         return root * root == candidate
     }
-
+    
     /// Returns `true` if this number is a square number (perfect square).
     ///
     /// Square numbers are integers that are the square of an integer: 1, 4, 9, 16, 25, 36, 49, 64...
@@ -97,7 +97,7 @@ public extension Math {
         let root = Int(Double(n).squareRoot())
         return root * root == n
     }
-
+    
     /// Returns `true` if this number is a cube number (perfect cube).
     ///
     /// Cube numbers are integers that are the cube of an integer: 1, 8, 27, 64, 125, 216...
@@ -107,7 +107,7 @@ public extension Math {
         let root = Int(round(pow(Double(absN), 1.0/3.0)))
         return root * root * root == absN
     }
-
+    
     /// Returns `true` if this number is a Fibonacci number.
     ///
     /// Fibonacci sequence: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144...
@@ -130,7 +130,7 @@ public extension Math {
         
         return b == n
     }
-
+    
     /// Returns `true` if this number is a palindrome.
     ///
     /// A palindromic number reads the same forwards and backwards: 0, 1, 2...9, 11, 22, 101, 121, 1331...
@@ -138,17 +138,17 @@ public extension Math {
         let str = self.description
         return str == String(str.reversed())
     }
-
+    
     /// Returns `true` if this number is a happy number.
     ///
     /// A happy number eventually reaches 1 when replaced by the sum of squares of its digits repeatedly.
     /// Examples: 1, 7, 10, 13, 19, 23, 28, 31, 32, 44, 49, 68, 70, 79, 82, 86, 91, 94, 97, 100...
     var isHappy: Bool {
         guard let n = self.asInt, n > 0 else { return false }
-
+        
         var seen = Set<Int>()
         var current = n
-
+        
         while current != 1 && !seen.contains(current) {
             seen.insert(current)
             var sum = 0
@@ -159,48 +159,48 @@ public extension Math {
             }
             current = sum
         }
-
+        
         return current == 1
     }
-
+    
     /// Returns `true` if this number is a narcissistic number (Armstrong number).
     ///
     /// A narcissistic number equals the sum of its digits each raised to the power of the number of digits.
     /// Examples: 0, 1, 2...9 (1 digit), 153 = 1³+5³+3³, 370, 371, 407, 1634, 8208, 9474...
     var isNarcissistic: Bool {
         guard let n = self.asInt, n >= 0 else { return false }
-
+        
         let str = String(n)
         let power = str.count
         var sum = 0
-
+        
         for char in str {
             if let digit = Int(String(char)) {
                 sum += Int(pow(Double(digit), Double(power)))
             }
         }
-
+        
         return sum == n
     }
-
+    
     /// Returns `true` if this number is a Harshad number (Niven number).
     ///
     /// A Harshad number is divisible by the sum of its digits.
     /// Examples: 1, 2...10, 12, 18, 20, 21, 24, 27, 30, 36, 40, 42, 45, 48, 50...
     var isHarshad: Bool {
         guard let n = self.asInt, n > 0 else { return false }
-
+        
         var sum = 0
         var temp = n
-
+        
         while temp > 0 {
             sum += temp % 10
             temp /= 10
         }
-
+        
         return sum > 0 && n % sum == 0
     }
-
+    
     /// Returns `true` if this number is a Keith number.
     ///
     /// A Keith number generates a Fibonacci-like sequence starting with its digits,
@@ -208,18 +208,18 @@ public extension Math {
     /// Examples: 14, 19, 28, 47, 61, 75, 197, 742, 1104...
     var isKeith: Bool {
         guard let n = self.asInt, n >= 10 else { return false }
-
+        
         let digits = String(n).compactMap { Int(String($0)) }
         var sequence = digits
-
+        
         while sequence.last! < n {
             let next = sequence.suffix(digits.count).reduce(0, +)
             sequence.append(next)
         }
-
+        
         return sequence.last! == n
     }
-
+    
     /// Returns `true` if this is a power of 2.
     ///
     /// Powers of 2: 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024...
@@ -227,7 +227,7 @@ public extension Math {
         guard let n = self.asInt, n > 0 else { return false }
         return (n & (n - 1)) == 0
     }
-
+    
     /// Returns `true` if this is a power of 10.
     ///
     /// Powers of 10: 1, 10, 100, 1000, 10000...
@@ -238,5 +238,75 @@ public extension Math {
             temp /= 10
         }
         return temp == 1
+    }
+    
+    /// A Boolean value indicating whether this number is a
+    /// *lucky number* according to the Josephus Flavius sieve.
+    ///
+    /// Lucky numbers are defined by repeatedly removing numbers
+    /// from the natural numbers sequence using the following
+    /// sieve process:
+    ///
+    /// 1. Start with the positive integers: 1, 2, 3, 4, 5, ...
+    /// 2. Remove every 2nd number, leaving 1, 3, 5, 7, 9, ...
+    /// 3. The next surviving number is 3, so remove every 3rd
+    ///    number, leaving 1, 3, 7, 9, 13, 15, ...
+    /// 4. The next surviving number is 7, so remove every 7th
+    ///    number.
+    /// 5. Continue this process indefinitely.
+    ///
+    /// The resulting sequence is:
+    /// `1, 3, 7, 9, 13, 15, 21, 25, 31, 33, ...`
+    ///
+    /// ### Example
+    ///
+    /// ```swift
+    /// Math(7).isLucky      // true
+    /// Math(8).isLucky      // false
+    /// Math(13).isLucky     // true
+    /// ```
+    ///
+    /// Lucky numbers share some similarities with primes, but
+    /// arise from a distinct sieving process.
+    ///
+    /// - Returns: `true` if this number is lucky, otherwise `false`.
+    var isLucky: Bool {
+        let n = Int(self.description) ?? 0
+        guard n > 0 else { return false }
+        
+        var numbers = Array(1...(n * 10))
+        var i = 1
+        
+        while i < numbers.count {
+            let step = numbers[i]
+            if step > numbers.count { break }
+            
+            numbers = numbers.enumerated().filter { (index, _) in
+                (index + 1) % step != 0
+            }.map { $0.element }
+            
+            i += 1
+        }
+        
+        return numbers.contains(n)
+    }
+    
+    /// Returns `true` if this number is a palindromic number.
+    ///
+    /// A *palindromic number* is a number that reads the same
+    /// forwards and backwards.
+    ///
+    /// ### Examples
+    ///
+    /// ```swift
+    /// Math(121).isPalindromic   // true   ("121")
+    /// Math(1331).isPalindromic  // true   ("1331")
+    /// Math(123).isPalindromic   // false  ("321")
+    /// ```
+    ///
+    /// - Returns: `true` if this number is palindromic, otherwise `false`.
+    var isPalindromic: Bool {
+        let s = self.description
+        return s == String(s.reversed())
     }
 }
