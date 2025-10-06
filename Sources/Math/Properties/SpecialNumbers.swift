@@ -15,7 +15,7 @@ public extension Math {
     /// A perfect number equals the sum of its proper divisors (divisors excluding itself).
     /// Examples: 6 = 1+2+3, 28 = 1+2+4+7+14, 496, 8128.
     var isPerfect: Bool {
-        guard let n = self.asInt, n > 1 else { return false }
+        guard let n = self.asInt, n > 3 else { return false }
         
         var sum = 1
         let limit = Int(Double(n).squareRoot())
@@ -37,7 +37,7 @@ public extension Math {
     /// An abundant number is less than the sum of its proper divisors.
     /// Example: 12 < 1+2+3+4+6 = 16
     var isAbundant: Bool {
-        guard let n = self.asInt, n > 1 else { return false }
+        guard let n = self.asInt, n > 3 else { return false }
         
         var sum = 1
         let limit = Int(Double(n).squareRoot())
@@ -59,7 +59,7 @@ public extension Math {
     /// A deficient number is greater than the sum of its proper divisors.
     /// Most numbers are deficient. Examples: 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17...
     var isDeficient: Bool {
-        guard let n = self.asInt, n > 1 else { return false }
+        guard let n = self.asInt, n > 3 else { return false }
         
         var sum = 1
         let limit = Int(Double(n).squareRoot())
@@ -308,5 +308,239 @@ public extension Math {
     var isPalindromic: Bool {
         let s = self.description
         return s == String(s.reversed())
+    }
+    
+    /// Returns `true` if this number is automorphic.
+    ///
+    /// A number n is automorphic if n^2 ends with the same digits as n.
+    /// Examples: 1 (1^2=1), 5 (25), 6 (36), 25 (625), 76 (5776)
+    var isAutomorphic: Bool {
+        guard let n = self.asInt, n >= 0 else { return false }
+        let square = n * n
+        let nStr = String(n)
+        let sStr = String(square)
+        return sStr.hasSuffix(nStr)
+    }
+
+    /// Returns `true` if this number is a Kaprekar number.
+    ///
+    /// For base 10, a Kaprekar number n has the property that there exists a split of n^2
+    /// into two parts that sum to n. The right part must have the same number of digits as n,
+    /// but this implementation checks all possible splits.
+    ///
+    /// Examples: 1, 9, 45, 55, 99, 297, 703, 999 ...
+    var isKaprekar: Bool {
+        guard let n = self.asInt, n > 0 else { return false }
+        let sq = n * n
+        let s = String(sq)
+        // Try all split positions
+        for i in 1...s.count { // split after i characters from left
+            let leftStr = String(s.prefix(i))
+            let rightStr = String(s.suffix(s.count - i))
+            let left = Int(leftStr) ?? 0
+            let right = Int(rightStr) ?? 0
+            if right > 0 && left + right == n { return true }
+            // Some definitions allow right == 0 for n == left; keep conservative above
+        }
+        // Handle the case n == 1 explicitly (1^2 = 1)
+        return n == 1
+    }
+
+    /// Returns `true` if this number is a Smith number.
+    ///
+    /// A Smith number is a composite number for which the sum of its digits is equal to the
+    /// sum of the digits in its prime factorization (counted with multiplicity).
+    ///
+    /// Examples: 4 (2+2 = 4), 22 (2+2 = 4; 22 digits 2+2=4), 27 (3+3+3 = 9; 27 digits 2+7=9)
+    var isSmith: Bool {
+        guard let n = self.asInt, n > 1 else { return false }
+        // Smith numbers are composite
+        guard !self.isPrime else { return false }
+        let digitSumN = Self.digitSum(n)
+        let factors = Self.primeFactors(of: n)
+        let digitSumFactors = factors.reduce(0) { $0 + Self.digitSum($1) }
+        return digitSumN == digitSumFactors
+    }
+
+    // MARK: - Helpers for Smith/Kaprekar/Automorphic
+
+    /// Sum of decimal digits of a non-negative integer
+    private static func digitSum(_ x: Int) -> Int {
+        var n = abs(x)
+        var sum = 0
+        while n > 0 {
+            sum += n % 10
+            n /= 10
+        }
+        return sum
+    }
+
+    /// Returns the prime factors of `n` with multiplicity (for n > 1).
+    private static func primeFactors(of n: Int) -> [Int] {
+        var num = n
+        var result: [Int] = []
+        var d = 2
+        while d * d <= num {
+            while num % d == 0 {
+                result.append(d)
+                num /= d
+            }
+            d += (d == 2 ? 1 : 2) // check 2, then odd numbers
+        }
+        if num > 1 { result.append(num) }
+        return result
+    }
+    
+    /// Returns `true` if this number is pentagonal.
+    ///
+    /// A number n is pentagonal if n = k(3k − 1)/2 for some integer k ≥ 1.
+    /// Test: (24n + 1) must be a perfect square and (1 + √(24n+1)) is divisible by 6.
+    var isPentagonal: Bool {
+        guard let n = self.asInt, n > 0 else { return false }
+        let x = 24 * n + 1
+        let r = Int(Double(x).squareRoot())
+        guard r * r == x else { return false }
+        return (1 + r) % 6 == 0
+    }
+
+    /// Returns `true` if this number is hexagonal.
+    ///
+    /// A number n is hexagonal if n = k(2k − 1) for some integer k ≥ 1.
+    /// Test: (8n + 1) must be a perfect square and (1 + √(8n+1)) is divisible by 4.
+    var isHexagonal: Bool {
+        guard let n = self.asInt, n > 0 else { return false }
+        let x = 8 * n + 1
+        let r = Int(Double(x).squareRoot())
+        guard r * r == x else { return false }
+        return (1 + r) % 4 == 0
+    }
+
+    /// Returns `true` if this number is ugly (its prime factors are only 2, 3, and 5).
+    var isUgly: Bool {
+        guard let n0 = self.asInt, n0 > 0 else { return false }
+        var n = n0
+        for p in [2, 3, 5] {
+            while n % p == 0 { n /= p }
+        }
+        return n == 1
+    }
+
+    /// Returns `true` if this number is pronic (rectangular): n = k(k+1).
+    var isPronic: Bool {
+        guard let n = self.asInt, n >= 0 else { return false }
+        let k = Int(Double(n).squareRoot())
+        return k * (k + 1) == n || (k - 1) * k == n
+    }
+
+    /// Returns `true` if this number is a duck number (contains a zero digit, not counting leading zeros).
+    var isDuck: Bool {
+        var s = self.description
+        if s.first == "-" { s.removeFirst() }
+        guard !s.isEmpty else { return false }
+        while s.first == "0" { s.removeFirst() }
+        return s.contains("0")
+    }
+
+    /// Returns `true` if this number is a buzz number (divisible by 7 or ends with 7).
+    var isBuzz: Bool {
+        guard let n = self.asInt else { return false }
+        return n % 7 == 0 || abs(n) % 10 == 7
+    }
+
+    /// Returns `true` if this number is neon (sum of digits of n^2 equals n).
+    var isNeon: Bool {
+        guard let n = self.asInt, n >= 0 else { return false }
+        let sq = n * n
+        var m = sq
+        var sum = 0
+        while m > 0 {
+            sum += m % 10
+            m /= 10
+        }
+        return sum == n
+    }
+
+    /// Returns `true` if this number is square-free (no squared prime divides it).
+    /// 1 is considered square-free.
+    var isSquareFree: Bool {
+        guard let n0 = self.asInt, n0 > 0 else { return false }
+        if n0 == 1 { return true }
+        var n = n0
+        var p = 2
+        while p * p <= n {
+            var count = 0
+            while n % p == 0 {
+                n /= p
+                count += 1
+                if count >= 2 { return false }
+            }
+            p += (p == 2 ? 1 : 2)
+        }
+        return true
+    }
+
+    /// Returns `true` if this number is powerful (for every prime factor p, p^2 divides n).
+    /// 1 is considered powerful by convention.
+    var isPowerful: Bool {
+        guard let n0 = self.asInt, n0 > 0 else { return false }
+        if n0 == 1 { return true }
+        var n = n0
+        var foundAny = false
+        var p = 2
+        while p * p <= n {
+            var count = 0
+            while n % p == 0 {
+                n /= p
+                count += 1
+                foundAny = true
+            }
+            if count > 0 && count < 2 { return false }
+            p += (p == 2 ? 1 : 2)
+        }
+        // If leftover n > 1, it is a prime factor with exponent 1
+        if n > 1 { return false }
+        return foundAny
+    }
+
+    /// Returns `true` if this number is sunny (n + 1 is a perfect square).
+    var isSunny: Bool {
+        return (self + 1).isSquare
+    }
+
+    /// Returns `true` if this number is trimorphic (n^3 ends with n).
+    var isTrimorphic: Bool {
+        guard let n = self.asInt, n >= 0 else { return false }
+        let cube = n * n * n
+        return String(cube).hasSuffix(String(n))
+    }
+
+    /// Returns `true` if this number is a Disarium number.
+    /// Sum of its digits powered with their positions equals the number.
+    var isDisarium: Bool {
+        guard let n = self.asInt, n >= 0 else { return false }
+        let s = String(n)
+        var sum = 0
+        for (i, ch) in s.enumerated() {
+            if let d = Int(String(ch)) {
+                sum += Int(pow(Double(d), Double(i + 1)))
+            }
+        }
+        return sum == n
+    }
+
+    /// Returns `true` if this number is a Spy number (sum of digits equals product of digits).
+    var isSpy: Bool {
+        guard let n = self.asInt, n >= 0 else { return false }
+        if n == 0 { return true } // digits: [0], sum=0, product=0
+        var m = n
+        var sum = 0
+        var product = 1
+        while m > 0 {
+            let d = m % 10
+            sum += d
+            product *= d
+            m /= 10
+        }
+        return sum == product
     }
 }
