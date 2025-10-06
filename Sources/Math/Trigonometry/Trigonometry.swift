@@ -19,61 +19,40 @@ precedencegroup FunctionPrecedence {
 // MARK: - Trigonometric Functions
 
 public extension Math {
-
+    
     // MARK: - Sine Function
     /// Computes the sine of a Math value using a Taylor series expansion.
     /// - Parameter x: Angle in degrees or radians based on MathSettings.
     /// - Returns: sin(x) as a Math value.
     ///
     /// Note: Precision depends on `MathSettings.shared.precision`.
-    static func sin(_ x: Math) -> Math {
-        // 1. Get current settings (angle mode and precision)
-        let settings = MathSettings.shared
-
-        // 2. Convert input to radians if necessary (Taylor series expects radians)
-        let rad: Math
-        switch settings.angleMode {
-        case .degrees:
-            rad = x * .pi / 180
-        case .radians:
-            rad = x
+    static func sin(_ x: Math, precision: Int = Int(MathSettings.shared.precision)) -> Math {
+        let rad = x   // already in radians
+        var term: Math = rad       // first term (k = 0 → x)
+        var result: Math = term
+        
+        for k in 1..<precision {
+            term *= -1 * rad * rad / Math(integerLiteral: (2 * k) * (2 * k + 1))
+            result += term
         }
-
-        let n = settings.precision
-
-        // 3. Compute sine using Taylor expansion
-        var result: Math = 0
-        for k in 0..<n {
-            let numerator = ((-1) ** k) * (rad ** (2 * k + 1))
-            let denominator = (2 * k + 1)~!
-            result += numerator / denominator
-        }
+        
         return result
     }
-
+    
     // MARK: - Cosine Function
     /// Computes the cosine of a Math value using a Taylor series expansion.
     /// - Parameter x: Angle in degrees or radians based on MathSettings.
     /// - Returns: cos(x) as a Math value.
-    static func cos(_ x: Math) -> Math {
-        // Convert input to radians
-        let rad: Math
-        switch MathSettings.shared.angleMode {
-        case .degrees:
-            rad = x * .pi / 180
-        case .radians:
-            rad = x
+    static func cos(_ x: Math, precision: Int = Int(MathSettings.shared.precision)) -> Math {
+        let rad = x
+        var term: Math = 1          // first term (k = 0 → 1)
+        var result: Math = term
+        
+        for k in 1..<precision {
+            term *= -1 * rad * rad / Math(integerLiteral: (2 * k - 1) * (2 * k))
+            result += term
         }
-
-        let n = MathSettings.shared.precision
-
-        // Compute cosine using Taylor expansion
-        var result: Math = 0
-        for k in 0..<n {
-            let numerator = ((-1) ** k) * (rad ** (2 * k))
-            let denominator = (2 * k)~!
-            result += numerator / denominator
-        }
+        
         return result
     }
 
@@ -81,9 +60,9 @@ public extension Math {
     /// Computes the tangent of a Math value: tan(x) = sin(x) / cos(x).
     /// - Parameter x: Angle in degrees or radians based on MathSettings.
     /// - Returns: tan(x) as a Math value.
-    static func tan(_ x: Math) -> Math {
-        let sinVal = sin(x)
-        let cosVal = cos(x)
+    static func tan(_ x: Math, precision: Int = Int(MathSettings.shared.precision)) -> Math {
+        let sinVal = sin(x, precision: precision)   // 👈 call the function
+        let cosVal = cos(x, precision: precision)   // 👈 call the function
         guard cosVal != 0 else {
             fatalError("tan undefined at x = ±90° (±π/2)")
         }
