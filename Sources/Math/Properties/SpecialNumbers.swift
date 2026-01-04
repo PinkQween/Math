@@ -273,23 +273,83 @@ public extension Math {
     var isLucky: Bool {
         let n = Int(self.description) ?? 0
         guard n > 0 else { return false }
+        if n == 1 { return true }
+        if n % 2 == 0 { return false }
         
-        var numbers = Array(1...(n * 10))
-        var i = 1
+        // Start with position in odd numbers sequence
+        var pos = (n + 1) / 2
         
-        while i < numbers.count {
-            let step = numbers[i]
-            if step > numbers.count { break }
+        // Apply sieve steps
+        var step = 3
+        var removed = 1
+        
+        while step <= pos {
+            // Check if current position would be removed at this step
+            if pos % step == 0 {
+                return false
+            }
             
-            numbers = numbers.enumerated().filter { (index, _) in
-                (index + 1) % step != 0
-            }.map { $0.element }
+            // Adjust position for already removed numbers
+            let removedAtThisStep = (pos - removed) / step
+            removed += removedAtThisStep
+            pos -= removedAtThisStep
             
-            i += 1
+            // Move to next step (next lucky number position)
+            // Calculate next lucky position after sieving
+            var nextStep = step + 1
+            var tempPos = (nextStep * 2 - 1 + 1) / 2
+            
+            // Find next position that survives all previous sieves
+            while true {
+                var survives = true
+                var checkStep = 3
+                var checkRemoved = 1
+                
+                while checkStep < nextStep && survives {
+                    if tempPos % checkStep == 0 {
+                        survives = false
+                        break
+                    }
+                    let removedAtCheck = (tempPos - checkRemoved) / checkStep
+                    checkRemoved += removedAtCheck
+                    tempPos -= removedAtCheck
+                    
+                    checkStep += 2
+                    while checkStep < nextStep {
+                        let testPos = (checkStep * 2 - 1 + 1) / 2
+                        var testSurvives = true
+                        var innerCheckStep = 3
+                        var innerRemoved = 1
+                        
+                        while innerCheckStep < checkStep && testSurvives {
+                            if testPos % innerCheckStep == 0 {
+                                testSurvives = false
+                                break
+                            }
+                            let innerRemovedAtCheck = (testPos - innerRemoved) / innerCheckStep
+                            innerRemoved += innerRemovedAtCheck
+                            innerCheckStep = innerCheckStep == 3 ? 7 : innerCheckStep + 2
+                        }
+                        
+                        if testSurvives {
+                            break
+                        }
+                        checkStep += 2
+                    }
+                }
+                
+                if survives {
+                    step = nextStep * 2 - 1
+                    break
+                }
+                nextStep += 1
+                tempPos = (nextStep * 2 - 1 + 1) / 2
+            }
         }
         
-        return numbers.contains(n)
+        return true
     }
+
     
     /// Returns `true` if this number is a palindromic number.
     ///
@@ -543,4 +603,123 @@ public extension Math {
         }
         return sum == product
     }
+
+    /// Returns `true` if this number is a perfect power: n = a^b with integers a > 1, b > 1.
+    var isPerfectPower: Bool {
+        guard let n = self.asInt, n > 1 else { return false }
+        let maxBase = Int(Double(n).squareRoot())
+        if maxBase < 2 { return false }
+        for a in 2...maxBase {
+            var value = a * a
+            while value <= n {
+                if value == n { return true }
+                if value > n / a { break }
+                value *= a
+            }
+        }
+        return false
+    }
+
+    /// Returns `true` if this number is a prime power with exponent ≥ 2: n = p^k, k ≥ 2.
+    var isPrimePower: Bool {
+        guard let n = self.asInt, n > 1 else { return false }
+        // Factorize n and ensure all prime factors are the same and exponent ≥ 2
+        var num = n
+        var p = 2
+        var primeFactor: Int? = nil
+        var exponent = 0
+        while p * p <= num {
+            while num % p == 0 {
+                if let pf = primeFactor, pf != p { return false }
+                primeFactor = p
+                exponent += 1
+                num /= p
+            }
+            p += (p == 2 ? 1 : 2)
+        }
+        if num > 1 {
+            if let pf = primeFactor, pf != num { return false }
+            primeFactor = num
+            exponent += 1
+        }
+        return primeFactor != nil && exponent >= 2
+    }
+
+    /// Returns `true` if this number is a factorion (Krishnamurthy number):
+    /// the sum of the factorials of its digits equals the number.
+    /// Examples: 1, 2, 145, 40585
+    var isFactorion: Bool {
+        guard let n = self.asInt, n >= 0 else { return false }
+        var m = n
+        var sum = 0
+        while m > 0 {
+            let d = m % 10
+            sum += Math.factorialDigitLookup[d]
+            m /= 10
+        }
+        if n == 0 { return Math.factorialDigitLookup[0] == 0 } // 0! = 1, so 0 is not a factorion
+        return sum == n
+    }
+
+    /// Alias for `isNarcissistic`.
+    var isArmstrong: Bool { self.isNarcissistic }
+
+    /// Returns `true` if this number is a palindrome in binary representation.
+    var isBinaryPalindromic: Bool {
+        guard let n = self.asInt, n >= 0 else { return false }
+        let s = String(n, radix: 2)
+        return s == String(s.reversed())
+    }
+
+    /// Returns `true` if this number is a palindrome in hexadecimal representation.
+    var isHexPalindromic: Bool {
+        guard let n = self.asInt, n >= 0 else { return false }
+        let s = String(n, radix: 16)
+        return s == String(s.reversed())
+    }
+
+    /// Returns `true` if this number is tetrahedral: n = k(k+1)(k+2)/6 for some k ≥ 1.
+    var isTetrahedral: Bool {
+        guard let n = self.asInt, n > 0 else { return false }
+        var k = 1
+        while true {
+            let value = k * (k + 1) * (k + 2) / 6
+            if value == n { return true }
+            if value > n { return false }
+            k += 1
+        }
+    }
+
+    /// Returns `true` if this number is a centered square number: n = 1 + 4*T(k).
+    var isCenteredSquare: Bool {
+        guard let n = self.asInt, n > 0 else { return false }
+        let diff = n - 1
+        guard diff % 4 == 0 else { return false }
+        let t = Math(integerLiteral: diff / 4)
+        return t.isTriangular
+    }
+
+    /// Returns `true` if this number is a power of three.
+    var isPowerOfThree: Bool {
+        guard let n0 = self.asInt, n0 > 0 else { return false }
+        var n = n0
+        while n % 3 == 0 { n /= 3 }
+        return n == 1
+    }
+
+    /// Returns `true` if this number is a power of five.
+    var isPowerOfFive: Bool {
+        guard let n0 = self.asInt, n0 > 0 else { return false }
+        var n = n0
+        while n % 5 == 0 { n /= 5 }
+        return n == 1
+    }
+
+    // MARK: - Local helpers
+    /// Precomputed factorials for digits 0...9
+    private static let factorialDigitLookup: [Int] = {
+        var f = [Int](repeating: 1, count: 10)
+        for i in 2..<10 { f[i] = f[i - 1] * i }
+        return f
+    }()
 }
