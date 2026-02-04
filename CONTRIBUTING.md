@@ -55,23 +55,6 @@ swift test
 swift package generate-documentation
 ```
 
-## Project Structure
-
-The project follows a modular structure:
-
-```
-Sources/Math/
-├── Core/               # Core Math type and settings
-├── Operations/         # Arithmetic, hyperoperations, factorials, roots, trig
-├── Properties/         # Number properties (primes, special numbers, etc.)
-├── Units/              # Unit system (200+ units)
-├── Algebra/            # Matrix and vector operations
-├── Constants/          # Mathematical and physical constants
-├── Definitions/        # Basic enums (Parity, Sign)
-├── Miscellaneous/      # Utilities like NumberSpeller
-└── Imported/           # BigInt implementation
-```
-
 ## Coding Standards
 
 ### Swift API Design Guidelines
