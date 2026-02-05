@@ -244,6 +244,23 @@ public:
         return Math(math_previous_prime(ref_));
     }
     
+    // Pronunciation
+    std::string spelledOut() const {
+        char buffer[2048];
+        if (math_spelled_out(ref_, buffer, sizeof(buffer)) != MATH_SUCCESS) {
+            throw std::runtime_error("Failed to spell out number");
+        }
+        return std::string(buffer);
+    }
+    
+    std::string spelledAviation() const {
+        char buffer[2048];
+        if (math_spelled_aviation(ref_, buffer, sizeof(buffer)) != MATH_SUCCESS) {
+            throw std::runtime_error("Failed to spell out number in aviation mode");
+        }
+        return std::string(buffer);
+    }
+    
     // Friend function for stream output
     friend std::ostream& operator<<(std::ostream& os, const Math& m) {
         os << m.toString();
@@ -290,6 +307,34 @@ inline Math tan(const Math& value) { return value.tan(); }
 inline Math asin(const Math& value) { return value.asin(); }
 inline Math acos(const Math& value) { return value.acos(); }
 inline Math atan(const Math& value) { return value.atan(); }
+
+// Constants namespace
+namespace Constants {
+    // Math constants
+    inline Math e() { return Math(math_const_e()); }
+    inline Math pi() { return Math(math_const_pi()); }
+    inline Math tau() { return Math(math_const_tau()); }
+    inline Math phi() { return Math(math_const_phi()); }           // Golden ratio
+    inline Math sqrt2() { return Math(math_const_sqrt2()); }
+    inline Math sqrt3() { return Math(math_const_sqrt3()); }
+    
+    // Physics constants (SI units)
+    inline Math speedOfLight() { return Math(math_const_speed_of_light()); }      // m/s
+    inline Math planck() { return Math(math_const_planck()); }                    // J·s
+    inline Math gravitational() { return Math(math_const_gravitational()); }      // m³/(kg·s²)
+    inline Math boltzmann() { return Math(math_const_boltzmann()); }              // J/K
+    inline Math avogadro() { return Math(math_const_avogadro()); }                // mol⁻¹
+    inline Math electronMass() { return Math(math_const_electron_mass()); }       // kg
+    inline Math protonMass() { return Math(math_const_proton_mass()); }           // kg
+    inline Math elementaryCharge() { return Math(math_const_elementary_charge()); } // C
+    
+    // Aliases
+    inline Math c() { return speedOfLight(); }
+    inline Math h() { return planck(); }
+    inline Math G() { return gravitational(); }
+    inline Math k() { return boltzmann(); }
+    inline Math NA() { return avogadro(); }
+}
 
 } // namespace PQMath
 

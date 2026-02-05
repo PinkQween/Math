@@ -354,3 +354,113 @@ public func math_set_precision(_ precision: Int32) {
 public func math_get_precision() -> Int32 {
     return Int32(MathSettings.shared.precisionInt)
 }
+
+// MARK: - Pronunciation
+
+@_cdecl("math_spelled_out")
+public func math_spelled_out(_ math: UnsafeMutableRawPointer?, _ buffer: UnsafeMutablePointer<CChar>?, _ bufferSize: Int) -> Int32 {
+    guard let box = toMathBox(math), let buffer = buffer, bufferSize > 0 else {
+        return -4 // MATH_ERROR_NULL_POINTER
+    }
+    
+    let str = box.value.spelledOut
+    guard let cString = str.cString(using: .utf8), cString.count <= bufferSize else {
+        return -3 // MATH_ERROR_OUT_OF_RANGE
+    }
+    
+    cString.withUnsafeBufferPointer { ptr in
+        buffer.update(from: ptr.baseAddress!, count: min(ptr.count, bufferSize))
+    }
+    
+    return 0 // MATH_SUCCESS
+}
+
+@_cdecl("math_spelled_aviation")
+public func math_spelled_aviation(_ math: UnsafeMutableRawPointer?, _ buffer: UnsafeMutablePointer<CChar>?, _ bufferSize: Int) -> Int32 {
+    guard let box = toMathBox(math), let buffer = buffer, bufferSize > 0 else {
+        return -4 // MATH_ERROR_NULL_POINTER
+    }
+    
+    let str = box.value.spelledAviation
+    guard let cString = str.cString(using: .utf8), cString.count <= bufferSize else {
+        return -3 // MATH_ERROR_OUT_OF_RANGE
+    }
+    
+    cString.withUnsafeBufferPointer { ptr in
+        buffer.update(from: ptr.baseAddress!, count: min(ptr.count, bufferSize))
+    }
+    
+    return 0 // MATH_SUCCESS
+}
+
+// MARK: - Constants
+
+@_cdecl("math_const_e")
+public func math_const_e() -> UnsafeMutableRawPointer? {
+    return fromMath(MathConstants.e)
+}
+
+@_cdecl("math_const_pi")
+public func math_const_pi() -> UnsafeMutableRawPointer? {
+    return fromMath(MathConstants.pi)
+}
+
+@_cdecl("math_const_tau")
+public func math_const_tau() -> UnsafeMutableRawPointer? {
+    return fromMath(ExtendedMathConstants.tau)
+}
+
+@_cdecl("math_const_phi")
+public func math_const_phi() -> UnsafeMutableRawPointer? {
+    return fromMath(ExtendedMathConstants.φ)
+}
+
+@_cdecl("math_const_sqrt2")
+public func math_const_sqrt2() -> UnsafeMutableRawPointer? {
+    return fromMath(MathConstants.sqrt2)
+}
+
+@_cdecl("math_const_sqrt3")
+public func math_const_sqrt3() -> UnsafeMutableRawPointer? {
+    return fromMath(MathConstants.sqrt3)
+}
+
+@_cdecl("math_const_speed_of_light")
+public func math_const_speed_of_light() -> UnsafeMutableRawPointer? {
+    return fromMath(PhysicsConstants.c)
+}
+
+@_cdecl("math_const_planck")
+public func math_const_planck() -> UnsafeMutableRawPointer? {
+    return fromMath(PhysicsConstants.h)
+}
+
+@_cdecl("math_const_gravitational")
+public func math_const_gravitational() -> UnsafeMutableRawPointer? {
+    return fromMath(PhysicsConstants.G)
+}
+
+@_cdecl("math_const_boltzmann")
+public func math_const_boltzmann() -> UnsafeMutableRawPointer? {
+    return fromMath(PhysicsConstants.boltzmannConstant)
+}
+
+@_cdecl("math_const_avogadro")
+public func math_const_avogadro() -> UnsafeMutableRawPointer? {
+    return fromMath(PhysicsConstants.avogadroConstant)
+}
+
+@_cdecl("math_const_electron_mass")
+public func math_const_electron_mass() -> UnsafeMutableRawPointer? {
+    return fromMath(PhysicsConstants.electronMass)
+}
+
+@_cdecl("math_const_proton_mass")
+public func math_const_proton_mass() -> UnsafeMutableRawPointer? {
+    return fromMath(PhysicsConstants.protonMass)
+}
+
+@_cdecl("math_const_elementary_charge")
+public func math_const_elementary_charge() -> UnsafeMutableRawPointer? {
+    return fromMath(PhysicsConstants.elementaryCharge)
+}

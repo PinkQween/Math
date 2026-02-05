@@ -363,6 +363,50 @@ void math_set_precision(int precision);
  */
 int math_get_precision(void);
 
+/* ============================================================================
+ * MARK: - Pronunciation
+ * ========================================================================= */
+
+/**
+ * Spells out a number in English.
+ * @param math The Math object
+ * @param buffer Buffer to store the spelled-out text
+ * @param buffer_size Size of the buffer
+ * @return MATH_SUCCESS or error code
+ */
+MathError math_spelled_out(MathRef math, char* buffer, size_t buffer_size);
+
+/**
+ * Spells out a number in aviation pronunciation.
+ * @param math The Math object
+ * @param buffer Buffer to store the spelled-out text
+ * @param buffer_size Size of the buffer
+ * @return MATH_SUCCESS or error code
+ */
+MathError math_spelled_aviation(MathRef math, char* buffer, size_t buffer_size);
+
+/* ============================================================================
+ * MARK: - Constants
+ * ========================================================================= */
+
+/* Math Constants */
+MathRef math_const_e(void);           /* Euler's number (≈2.718) */
+MathRef math_const_pi(void);          /* Pi (≈3.14159) */
+MathRef math_const_tau(void);         /* Tau (2π ≈ 6.283) */
+MathRef math_const_phi(void);         /* Golden ratio (≈1.618) */
+MathRef math_const_sqrt2(void);       /* √2 (≈1.414) */
+MathRef math_const_sqrt3(void);       /* √3 (≈1.732) */
+
+/* Physics Constants (values in SI units) */
+MathRef math_const_speed_of_light(void);          /* c ≈ 299792458 m/s */
+MathRef math_const_planck(void);                  /* h ≈ 6.626×10⁻³⁴ J·s */
+MathRef math_const_gravitational(void);           /* G ≈ 6.674×10⁻¹¹ m³/(kg·s²) */
+MathRef math_const_boltzmann(void);               /* k ≈ 1.381×10⁻²³ J/K */
+MathRef math_const_avogadro(void);                /* N_A ≈ 6.022×10²³ mol⁻¹ */
+MathRef math_const_electron_mass(void);           /* m_e ≈ 9.109×10⁻³¹ kg */
+MathRef math_const_proton_mass(void);             /* m_p ≈ 1.673×10⁻²⁷ kg */
+MathRef math_const_elementary_charge(void);       /* e ≈ 1.602×10⁻¹⁹ C */
+
 #ifdef __cplusplus
 }
 #endif
