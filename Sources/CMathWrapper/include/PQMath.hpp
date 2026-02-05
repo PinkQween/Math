@@ -26,13 +26,6 @@ class Math {
 private:
     MathRef ref_;
     
-    // Private constructor from MathRef (takes ownership)
-    explicit Math(MathRef ref) : ref_(ref) {
-        if (!ref_) {
-            throw std::runtime_error("Failed to create Math object");
-        }
-    }
-    
 public:
     // Constructors
     Math(long long value) : ref_(math_create_int(value)) {
@@ -50,6 +43,13 @@ public:
     }
     
     Math(const char* value) : Math(std::string(value)) {}
+    
+    // Internal constructor from MathRef (for internal use and Constants namespace)
+    explicit Math(MathRef ref) : ref_(ref) {
+        if (!ref_) {
+            throw std::runtime_error("Failed to create Math object");
+        }
+    }
     
     // Copy constructor
     Math(const Math& other) : ref_(math_copy(other.ref_)) {
