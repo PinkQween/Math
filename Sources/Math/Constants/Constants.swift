@@ -20,7 +20,7 @@
 /// let speedOfLight = Constants.Physics.c
 /// let hubble = Constants.Astronomy.hubbleConstant
 /// let goldenRatio = Constants.Extended.φ
-/// ```
+/// ```ß
 public struct Constants {
 
     /// Basic mathematical constants (π, e, √2, √3).
