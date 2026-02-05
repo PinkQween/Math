@@ -6,3 +6,11 @@ DerivedData/
 .swiftpm/configuration/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
+
+# C/C++ build artifacts
+example_c
+example_cpp
+*.o
+*.so
+*.dylib
+*.dSYM

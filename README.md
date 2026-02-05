@@ -1,6 +1,6 @@
 # Math
 
-**Math** is a comprehensive Swift library for advanced mathematical computations with arbitrary precision, extensive number properties, and a complete units system. Built following Apple's coding standards with a clean, modular architecture.
+**Math** is a comprehensive Swift library for advanced mathematical computations with arbitrary precision, extensive number properties, and a complete units system. Built following Apple's coding standards with a clean, modular architecture. **Now with C/C++ support!**
 
 [![Swift](https://img.shields.io/badge/Swift-6.1-orange.svg)](https://swift.org)
 [![Platform](https://img.shields.io/badge/platform-Darwin%20%7C%20Linux-lightgrey.svg)](https://github.com/PinkQween/Math)
@@ -18,6 +18,7 @@
 - **Dynamic number handling** - integers, doubles, and large numbers seamlessly
 - **Operator overloading** for intuitive Swift-native syntax
 - **Thread-safe global settings** for precision and angle modes
+- **🆕 C/C++ wrappers** for cross-language interoperability
 
 ### 🚀 Advanced Operations
 - **Standard arithmetic**: `+`, `-`, `*`, `/`, `%`
@@ -63,6 +64,23 @@ Or in Xcode:
 1. File → Add Package Dependencies
 2. Enter: `https://github.com/PinkQween/Math.git`
 3. Select version `0.1.0` or later and add to your target
+
+### C/C++ Projects
+
+For using Math in C or C++ projects, see the [C/C++ Usage Guide](Examples/README.md).
+
+**Quick Start:**
+```bash
+# Build the library
+swift build -c release
+
+# Build C/C++ examples
+./build_examples.sh
+
+# Run examples
+DYLD_LIBRARY_PATH=.build/release ./example_c    # C
+DYLD_LIBRARY_PATH=.build/release ./example_cpp  # C++
+```
 
 > **Note**: This is an alpha release (0.1.0). The API may change in future versions. For production use, wait for version 1.0.0.
 
@@ -129,6 +147,54 @@ let data = Statistics([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 print(data.mean)                   // 5.5
 print(data.standardDeviation)      // ≈2.87
 ```
+
+### C/C++ Quick Start
+
+```c
+// C Example
+#include "math_wrapper.h"
+
+MathRef a = math_create_int(42);
+MathRef b = math_create_int(10);
+MathRef sum = math_add(a, b);
+
+char buffer[1024];
+math_to_string(sum, buffer, sizeof(buffer));
+printf("Result: %s\n", buffer);  // Result: 52
+
+// Check if prime
+if (math_is_prime(math_create_int(17))) {
+    printf("17 is prime!\n");
+}
+
+// Clean up
+math_destroy(a);
+math_destroy(b);
+math_destroy(sum);
+```
+
+```cpp
+// C++ Example (with RAII and operators!)
+#include "PQMath.hpp"
+using namespace math;
+
+Math a(42);
+Math b(10);
+
+// Natural operators
+std::cout << a + b << "\n";        // 52
+std::cout << a * b << "\n";        // 420
+std::cout << Math(2).power(Math(10)) << "\n";  // 1024
+
+// Properties
+if (Math(17).isPrime()) {
+    std::cout << "17 is prime!\n";
+}
+
+// No cleanup needed - RAII handles it!
+```
+
+See the [C/C++ Usage Guide](Examples/README.md) for complete documentation and examples.
 
 ## 📚 Documentation
 
@@ -267,6 +333,12 @@ Sources/Math/
 │   ├── MathSettings.swift  # Global settings
 │   └── MathStorage.swift   # Internal storage
 │
+├── CMathWrapper/            # C/C++ interop layer
+│   ├── MathWrapper.swift   # Swift -> C bridge
+│   └── include/            # Public headers
+│       ├── math_wrapper.h  # C API
+│       └── PQMath.hpp # C++ wrapper
+│
 ├── Operations/              # Mathematical operations
 │   ├── Arithmetic.swift    # +, -, *, /, %
 │   ├── Hyperoperations.swift  # **, ^^, ^^^
@@ -310,6 +382,9 @@ Sources/Math/
 
 ## 🎯 Use Cases
 
+- **Swift applications** with advanced mathematical requirements
+- **C/C++ integration** - use Swift's powerful math library from C/C++ code
+- **Cross-platform development** - Swift, C, and C++ on macOS and Linux
 - **Scientific computing** with arbitrary precision
 - **Educational tools** demonstrating number properties
 - **Physics simulations** with comprehensive units
