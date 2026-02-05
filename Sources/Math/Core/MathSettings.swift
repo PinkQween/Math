@@ -46,7 +46,8 @@ public final class MathSettings: @unchecked Sendable {
     private let lock = NSLock()
 
     private var _angleMode: AngleMode = .degrees
-    private var _precision: Math = 28174
+    private var _precision: Math = 50
+    private var _useFastTrig: Bool = true
 
     // Thread-safe accessors
     public var angleMode: AngleMode {
@@ -57,6 +58,18 @@ public final class MathSettings: @unchecked Sendable {
     public var precision: Math {
         get { lock.withLock { _precision } }
         set { lock.withLock { _precision = newValue } }
+    }
+
+    /// Use fast Double-based trig when possible.
+    public var useFastTrig: Bool {
+        get { lock.withLock { _useFastTrig } }
+        set { lock.withLock { _useFastTrig = newValue } }
+    }
+
+    /// Convenience precision accessor as Int.
+    public var precisionInt: Int {
+        get { lock.withLock { _precision.asInt ?? 0 } }
+        set { lock.withLock { _precision = Math(integerLiteral: newValue) } }
     }
 
     /// Get or set the full state atomically.
@@ -118,4 +131,14 @@ public func Calculate<T>(
     MathSettings.shared.state = newState
     defer { MathSettings.shared.state = oldState }
     return try work()
+}
+
+/// Executes a block under a temporary precision, keeping the current angle mode.
+public func WithPrecision<T>(
+    _ precision: Int,
+    perform work: () throws -> T
+) rethrows -> T {
+    let current = MathSettings.shared.state
+    let newState = MathState(angleMode: current.angleMode, precision: Math(integerLiteral: precision))
+    return try Calculate(settings: newState, perform: work)
 }

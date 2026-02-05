@@ -51,9 +51,15 @@ public enum MinimalDimension: String, CaseIterable, Sendable {
 public enum StandardDimension: String, CaseIterable, Sendable {
     case length, mass, time
     case electricCurrent, temperature, amountOfSubstance, luminousIntensity
-    case area, volume, speed, acceleration, force, energy, power, electricCharge
-    case voltage, electricalResistance, frequency, pressure, angle, informationStorage
-    case dataStorage, fuelEconomy
+    case area, volume, density, speed, acceleration, force, energy, power, electricCharge
+    case voltage, electricalResistance, frequency, pressure, angle, solidAngle
+    case dynamicViscosity, kinematicViscosity, magneticFieldStrength, electricFieldStrength
+    case electricCapacitance, electricConductance, inductance
+    case magneticFlux, magneticFluxDensity
+    case luminousFlux, illuminance
+    case radioactivity, absorbedDose, doseEquivalent, catalyticActivity
+    case informationStorage, dataStorage, dataRate, fuelEconomy
+    case dimensionless
 }
 
 // MARK: - Custom dimension metadata
@@ -84,6 +90,16 @@ public struct DimensionID: Hashable, Sendable {
 // MARK: - Numeric domain / unit type
 public enum NumericKind: Hashable, Sendable {
     case real, imaginary, complex, abstract(String)
+}
+
+// MARK: - Unit system metadata
+public enum UnitSystemID: String, CaseIterable, Sendable {
+    case si
+    case cgs
+    case imperial
+    case usCustomary
+    case astronomical
+    case planck
 }
 
 // MARK: - Dimension registry (actor)
@@ -125,6 +141,9 @@ public extension StandardDimension {
         case .time:   return [.time: 1]
         case .area:         return [.length: 2]
         case .volume:       return [.length: 3]
+        case .density:      return [.mass: 1, .length: -3]
+        case .dynamicViscosity: return [.mass: 1, .length: -1, .time: -1]
+        case .kinematicViscosity: return [.length: 2, .time: -1]
         case .speed:        return [.length: 1, .time: -1]
         case .acceleration: return [.length: 1, .time: -2]
         case .force:        return [.mass: 1, .length: 1, .time: -2]
@@ -133,10 +152,17 @@ public extension StandardDimension {
         case .frequency:    return [.time: -1]
         case .pressure:     return [.mass: 1, .length: -1, .time: -2]
         case .angle:        return [:]
+        case .solidAngle:   return [:]
         case .informationStorage: return [:]
         case .dataStorage:  return [:]
+        case .dimensionless: return [:]
         case .fuelEconomy:  return [.length: -2]
         case .electricCharge, .electricCurrent, .voltage, .electricalResistance, .temperature, .amountOfSubstance, .luminousIntensity:
+            return nil
+        case .magneticFieldStrength, .electricFieldStrength,
+             .electricCapacitance, .electricConductance, .inductance, .magneticFlux, .magneticFluxDensity,
+             .luminousFlux, .illuminance, .radioactivity, .absorbedDose, .doseEquivalent, .catalyticActivity,
+             .dataRate:
             return nil
         }
     }
@@ -157,6 +183,7 @@ public struct Unit: Hashable, Sendable {
     public let toBaseOffset: Math
     public let minimalExponents: [MinimalDimension: Int]?
     public let notes: String?
+    public let system: UnitSystemID?
 
     public init(
         name: String,
@@ -166,7 +193,8 @@ public struct Unit: Hashable, Sendable {
         toBaseScale: Math,
         toBaseOffset: Math = Math(0),
         minimalExponents: [MinimalDimension: Int]? = nil,
-        notes: String? = nil
+        notes: String? = nil,
+        system: UnitSystemID? = nil
     ) {
         self.name = name
         self.symbol = symbol
@@ -176,6 +204,7 @@ public struct Unit: Hashable, Sendable {
         self.toBaseOffset = toBaseOffset
         self.minimalExponents = minimalExponents ?? DimensionRegistry.shared.minimalExponentsSync(for: dimension)
         self.notes = notes
+        self.system = system
     }
 
     // MARK: - Conversion within dimension
@@ -205,7 +234,7 @@ public struct Unit: Hashable, Sendable {
         }
     }
 
-    private static func powMath(_ base: Math, _ exp: Int) -> Math {
+    static func powMath(_ base: Math, _ exp: Int) -> Math {
         guard exp != 0 else { return Math(1) }
         var result = Math(1)
         for _ in 0..<abs(exp) { result *= base }
@@ -256,6 +285,42 @@ public struct Unit: Hashable, Sendable {
         }
 
         return Unit(name: name, symbol: symbol, dimension: .custom(.init(id: name, displayName: name)), kind: kind, toBaseScale: combinedScale, toBaseOffset: Math(0), minimalExponents: exponents, notes: notes)
+    }
+
+    // MARK: - Prefix helpers
+    public func prefixed(
+        _ prefix: UnitPrefix,
+        nameOverride: String? = nil,
+        symbolOverride: String? = nil,
+        notes: String? = nil
+    ) -> Unit {
+        precondition(self.toBaseOffset == Math(0), "Prefixed units cannot include offset units")
+        let prefixedName = nameOverride ?? (prefix.name + self.name)
+        let prefixedSymbol = symbolOverride ?? (prefix.symbol + self.symbol)
+        return Unit(
+            name: prefixedName,
+            symbol: prefixedSymbol,
+            dimension: self.dimension,
+            kind: self.kind,
+            toBaseScale: self.toBaseScale * prefix.scale,
+            toBaseOffset: Math(0),
+            minimalExponents: self.minimalExponents,
+            notes: notes ?? self.notes,
+            system: self.system
+        )
+    }
+
+    public static func prefixedUnits(
+        for base: Unit,
+        prefixes: [UnitPrefix],
+        includeBase: Bool = true
+    ) -> [Unit] {
+        var result: [Unit] = []
+        if includeBase { result.append(base) }
+        for prefix in prefixes {
+            result.append(base.prefixed(prefix))
+        }
+        return result
     }
 }
 

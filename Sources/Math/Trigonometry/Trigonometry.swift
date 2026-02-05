@@ -19,6 +19,68 @@ precedencegroup FunctionPrecedence {
 // MARK: - Trigonometric Functions
 
 public extension Math {
+
+    private static func fastAngleResult(_ radians: Double) -> Math {
+        switch MathSettings.shared.angleMode {
+        case .degrees:
+            return Math(floatLiteral: radians * 180.0 / Double.pi)
+        case .radians:
+            return Math(floatLiteral: radians)
+        }
+    }
+
+    private static func fastReduceAngle(_ x: Double) -> Double {
+        let twoPi = Double.pi * 2.0
+        var y = x.truncatingRemainder(dividingBy: twoPi)
+        if y > Double.pi { y -= twoPi }
+        if y < -Double.pi { y += twoPi }
+        return y
+    }
+
+    private static func fastSin(_ x: Double) -> Double {
+        var y = fastReduceAngle(x)
+        if y > Double.pi / 2 { y = Double.pi - y }
+        if y < -Double.pi / 2 { y = -Double.pi - y }
+        let y2 = y * y
+        let y3 = y * y2
+        let y5 = y3 * y2
+        let y7 = y5 * y2
+        return y - (y3 / 6.0) + (y5 / 120.0) - (y7 / 5040.0)
+    }
+
+    private static func fastCos(_ x: Double) -> Double {
+        var y = fastReduceAngle(x)
+        var sign = 1.0
+        if y > Double.pi / 2 { y = Double.pi - y; sign = -1.0 }
+        if y < -Double.pi / 2 { y = -Double.pi - y; sign = -1.0 }
+        let y2 = y * y
+        let y4 = y2 * y2
+        let y6 = y4 * y2
+        return sign * (1.0 - (y2 / 2.0) + (y4 / 24.0) - (y6 / 720.0))
+    }
+
+    private static func fastAtan(_ x: Double) -> Double {
+        let ax = abs(x)
+        if ax > 1.0 {
+            let inner = fastAtan(1.0 / ax)
+            return (Double.pi / 2.0 - inner) * (x >= 0 ? 1.0 : -1.0)
+        }
+        let x2 = x * x
+        let x3 = x * x2
+        let x5 = x3 * x2
+        let x7 = x5 * x2
+        return x - (x3 / 3.0) + (x5 / 5.0) - (x7 / 7.0)
+    }
+
+    private static func fastAtan2(_ y: Double, _ x: Double) -> Double {
+        if x > 0 { return fastAtan(y / x) }
+        if x < 0 {
+            return y >= 0 ? fastAtan(y / x) + Double.pi : fastAtan(y / x) - Double.pi
+        }
+        if y > 0 { return Double.pi / 2.0 }
+        if y < 0 { return -Double.pi / 2.0 }
+        return 0.0
+    }
     
     // MARK: - Sine Function
     /// Computes the sine of a Math value using a Taylor series expansion.
@@ -27,6 +89,9 @@ public extension Math {
     ///
     /// Note: Precision depends on `MathSettings.shared.precision`.
     static func sin(_ x: Math, precision: Int = Int(MathSettings.shared.precision)) -> Math {
+        if MathSettings.shared.useFastTrig, let xd = x.asDouble {
+            return Math(floatLiteral: fastSin(xd))
+        }
         let rad = x   // already in radians
         var term: Math = rad       // first term (k = 0 → x)
         var result: Math = term
@@ -44,6 +109,9 @@ public extension Math {
     /// - Parameter x: Angle in degrees or radians based on MathSettings.
     /// - Returns: cos(x) as a Math value.
     static func cos(_ x: Math, precision: Int = Int(MathSettings.shared.precision)) -> Math {
+        if MathSettings.shared.useFastTrig, let xd = x.asDouble {
+            return Math(floatLiteral: fastCos(xd))
+        }
         let rad = x
         var term: Math = 1          // first term (k = 0 → 1)
         var result: Math = term
@@ -61,6 +129,9 @@ public extension Math {
     /// - Parameter x: Angle in degrees or radians based on MathSettings.
     /// - Returns: tan(x) as a Math value.
     static func tan(_ x: Math, precision: Int = Int(MathSettings.shared.precision)) -> Math {
+        if MathSettings.shared.useFastTrig, let xd = x.asDouble {
+            return Math(floatLiteral: fastSin(xd) / fastCos(xd))
+        }
         let sinVal = sin(x, precision: precision)   // 👈 call the function
         let cosVal = cos(x, precision: precision)   // 👈 call the function
         guard cosVal != 0 else {
@@ -77,6 +148,11 @@ public extension Math {
     /// ⚠️ Warning: Precision issues may occur when y = 1 / sqrt(2) (≈0.7071067812),
     /// resulting in small errors (~1e-16). Use caution and verify results for critical calculations.
     static func asin(_ y: Math) -> Math {
+        if MathSettings.shared.useFastTrig, let yd = y.asDouble {
+            let v = max(-1.0, min(1.0, yd))
+            let rad = fastAtan2(v, Foundation.sqrt(1.0 - v * v))
+            return fastAngleResult(rad)
+        }
         // 1. Clamp input domain [-1, 1]
         guard y >= -1 && y <= 1 else {
             fatalError("asin domain error: value must be between -1 and 1")
@@ -111,6 +187,11 @@ public extension Math {
     /// - Parameter x: Value in [-1, 1] range.
     /// - Returns: acos(x) as a Math value (degrees or radians depending on MathSettings).
     static func acos(_ x: Math) -> Math {
+        if MathSettings.shared.useFastTrig, let xd = x.asDouble {
+            let v = max(-1.0, min(1.0, xd))
+            let rad = fastAtan2(Foundation.sqrt(1.0 - v * v), v)
+            return fastAngleResult(rad)
+        }
         guard x >= -1 && x <= 1 else {
             fatalError("acos domain error: value must be between -1 and 1")
         }
@@ -134,6 +215,10 @@ public extension Math {
     /// - Parameter y: Any real value.
     /// - Returns: atan(y) as a Math value in range (-90°, 90°) or (-π/2, π/2).
     static func atan(_ y: Math) -> Math {
+        if MathSettings.shared.useFastTrig, let yd = y.asDouble {
+            let rad = fastAtan(yd)
+            return fastAngleResult(rad)
+        }
         // Initial guess using small-angle approximation
         var x = y / (1 + y * y)
 
@@ -166,6 +251,10 @@ public extension Math {
     ///   - x: X-coordinate
     /// - Returns: Angle in range (-180°, 180°] or (-π, π].
     static func atan2(_ y: Math, _ x: Math) -> Math {
+        if MathSettings.shared.useFastTrig, let yd = y.asDouble, let xd = x.asDouble {
+            let rad = fastAtan2(yd, xd)
+            return fastAngleResult(rad)
+        }
         // Handle special cases
         if x > 0 {
             return atan(y / x)

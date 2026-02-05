@@ -9,7 +9,6 @@ import Testing
 @testable import Math
 
 // MARK: - Basic Unit Conversion Tests
-
 @Suite("Unit Conversion")
 struct UnitConversionTests {
 
@@ -142,8 +141,8 @@ struct UnitConversionTests {
 
     @Test("Convert km/h to mph")
     func testKilometersPerHourToMilesPerHour() async throws {
-        let kmh = MathUnit(Math(100), StandardUnits.kilometersPerHour)
-        let mph = StandardUnits.kilometersPerHour.convertWithinDimension(kmh, to: StandardUnits.milesPerHour)
+        let kmh = MathUnit(Math(100), StandardUnits.kilometerPerHour)
+        let mph = StandardUnits.kilometerPerHour.convertWithinDimension(kmh, to: StandardUnits.milePerHour)
 
         #expect(mph != nil)
         // 100 km/h ≈ 62.137 mph

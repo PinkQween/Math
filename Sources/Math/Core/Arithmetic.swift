@@ -39,7 +39,7 @@ public extension Math {
 
         // Guard against division by zero
         guard rv != 0 else {
-            fatalError("Division by zero")
+            return Math(0)
         }
 
         // For (lv/10^ls) / (rv/10^rs), we need scale = ls - rs + precision

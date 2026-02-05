@@ -12,7 +12,8 @@ The Math library provides arbitrary-precision arithmetic, extensive unit convers
 - **Complex Numbers**: Full support for complex arithmetic in rectangular and polar forms
 - **Calculus Operations**: Numerical derivatives, integrals, series, limits, and root finding
 - **Statistical Analysis**: Comprehensive statistics with 40+ functions for data analysis
-- **200+ Units**: Comprehensive unit system with automatic conversions
+- **Units + Dimensional Analysis**: Unit conversions and unit-aware arithmetic with auto simplification
+- **Random Utilities**: Seedable random generators for reproducible results
 - **Advanced Operations**: Hyperoperations, factorials, roots, and complete trigonometry
 - **50+ Number Properties**: Prime detection, special numbers, and mathematical classifications
 - **Triangle Solver**: Solve triangles with any 3 known values using Law of Sines and Cosines
@@ -48,11 +49,17 @@ The Math library provides arbitrary-precision arithmetic, extensive unit convers
 - ``Unit``
 - ``MathUnit``
 - ``StandardUnits``
-- ``PhysicsUnits``
-- ``ExoticUnits``
 - ``DimensionID``
 - ``StandardDimension``
 - ``MinimalDimension``
+- <doc:Units>
+
+### Randomness
+
+- ``Random``
+- ``RandomSHA256``
+- ``RandomChaCha20``
+- <doc:Randomness>
 
 ### Number Properties
 
@@ -90,8 +97,7 @@ The Math library provides arbitrary-precision arithmetic, extensive unit convers
 
 ### Constants
 
-- <doc:MathematicalConstants>
-- <doc:PhysicalConstants>
+- <doc:Constants>
 
 ## Getting Started
 
@@ -119,6 +125,12 @@ let result = a * b
 let meters = MathUnit(Math(100), StandardUnits.meter)
 let feet = StandardUnits.meter.convertWithinDimension(meters, to: StandardUnits.foot)
 print(feet?.value)  // 328.084 ft
+
+// Unit arithmetic with simplification
+let area = MathUnit(Math(2), StandardUnits.squareMeter)
+let length = MathUnit(Math(3), StandardUnits.meter)
+let volume = area * length
+print(volume?.unit)  // cubic meter
 
 // Advanced operations
 let factorial = Math(10)~!  // 3628800
@@ -156,6 +168,11 @@ alu.setOperation(.add)
 alu.update()
 print(alu.output.intValue)  // 18
 print(alu.zero.signal)      // .low
+
+// Randomness
+var rng = Random(seed: 123)
+let r = rng.nextMath(in: 0..<10)
+print(r)
 ```
 
 ## See Also
